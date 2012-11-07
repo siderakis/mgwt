@@ -20,20 +20,46 @@ import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HasHandlers;
 
+/**
+ * Propagate events from a source. There is an issue on mobile webkit which gets
+ * confused about events if an alert is shown from an event handler, see:
+ * http://
+ * blog.daniel-kurka.de/2012/05/mobile-webkit-alert-dialog-breaks-touch.html
+ * 
+ * This class provides a workaround by propagating events with a
+ * ScheduledCommand
+ * 
+ * @author Daniel Kurka
+ * 
+ */
 public class EventPropagatorMobileImpl implements EventPropagator {
 
+	private static class SCommand implements ScheduledCommand {
+		private final HasHandlers source;
+		private final GwtEvent<?> event;
+
+		public SCommand(HasHandlers source, GwtEvent<?> event) {
+			this.source = source;
+			this.event = event;
+		}
+
+		@Override
+		public void execute() {
+			source.fireEvent(event);
+
+		}
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.googlecode.mgwt.dom.client.recognizer.EventPropagator#fireEvent(com.google.gwt.event.shared.HasHandlers, com.google.gwt.event.shared.GwtEvent)
+	 */
 	@Override
 	public void fireEvent(final HasHandlers source, final GwtEvent<?> event) {
 		// see issue 135
 		// http://code.google.com/p/mgwt/issues/detail?id=135
-		Scheduler.get().scheduleDeferred(new ScheduledCommand() {
-
-			@Override
-			public void execute() {
-				source.fireEvent(event);
-
-			}
-		});
+		Scheduler.get().scheduleDeferred(new SCommand(source, event));
 
 	}
 

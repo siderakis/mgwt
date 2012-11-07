@@ -13,31 +13,21 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.googlecode.mgwt.dom.client.recognizer;
+package com.googlecode.mgwt.dom.client.recognizer.tap;
 
-import com.google.gwt.event.shared.GwtEvent;
+import com.google.gwt.event.shared.EventHandler;
 
-public class GestureEvent extends GwtEvent<GestureHandler> {
-
-	private static final Type<GestureHandler> TYPE = new Type<GestureHandler>();
-
-	protected GestureEvent() {
-
-	}
-
-	@Override
-	public com.google.gwt.event.shared.GwtEvent.Type<GestureHandler> getAssociatedType() {
-		return TYPE;
-	}
-
-	@Override
-	protected void dispatch(GestureHandler handler) {
-		handler.onGesture(this);
-
-	}
-
-	public static Type<GestureHandler> getType() {
-		return TYPE;
-	}
-
+/**
+ * A {@link MultiTapHandler} receives {@link MultiTapEvent}s
+ * 
+ * @author Daniel Kurka
+ * 
+ */
+public interface MultiTapHandler extends EventHandler {
+	/**
+	 * called when an {@link MultiTapEvent} occurs.
+	 * 
+	 * @param event the event
+	 */
+	public void onMultiTap(MultiTapEvent event);
 }

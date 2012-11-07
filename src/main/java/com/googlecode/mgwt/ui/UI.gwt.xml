@@ -41,7 +41,7 @@ under * the License.
 	</replace-with>
 	
 		
-	<replace-with class="com.googlecode.mgwt.ui.client.widget.impl.ScrollPanelNewPort">
+	<replace-with class="com.googlecode.mgwt.ui.client.widget.impl.ScrollPanelTouchImpl">
 		<when-type-is class="com.googlecode.mgwt.ui.client.widget.impl.ScrollPanelImpl" />
 	</replace-with>
 	
@@ -99,6 +99,13 @@ under * the License.
 		
 	</replace-with>
 	
+	<replace-with class="com.googlecode.mgwt.ui.client.util.impl.OperaCssUtilImpl">
+		<when-type-is class="com.googlecode.mgwt.ui.client.util.impl.CssUtilImpl" />
+		<all>
+			<when-property-is name="user.agent" value="opera" />
+		</all>
+	</replace-with>
+	
 	
 	
 	
@@ -131,10 +138,16 @@ under * the License.
 		<when-type-is class="com.googlecode.mgwt.ui.client.widget.base.MValueBoxBase.MValueBoxBaseImpl" />
 	</replace-with>
 	
-	<replace-with class="com.googlecode.mgwt.ui.client.widget.base.MValueBoxBase.MValueBoxBaseIE9Impl">
+	<replace-with class="com.googlecode.mgwt.ui.client.widget.base.MValueBoxBase.MValueBoxBaseNoOpImpl">
 		<when-type-is class="com.googlecode.mgwt.ui.client.widget.base.MValueBoxBase.MValueBoxBaseImpl" />
 		<all> 
    			<when-property-is name="user.agent" value="ie9" />
+  		</all>
+	</replace-with>
+	<replace-with class="com.googlecode.mgwt.ui.client.widget.base.MValueBoxBase.MValueBoxBaseNoOpImpl">
+		<when-type-is class="com.googlecode.mgwt.ui.client.widget.base.MValueBoxBase.MValueBoxBaseImpl" />
+		<all> 
+   			<when-property-is name="mobile.user.agent" value="not_mobile" />
   		</all>
 	</replace-with>
 	
@@ -150,7 +163,36 @@ under * the License.
 		</all>
 	</replace-with>
 	
+	<!-- super dev mode -->
+	<define-configuration-property name="mgwt.superdevmode" is-multi-valued="false" />
+	<set-configuration-property name="mgwt.superdevmode" value="off" />
 	
+	<define-configuration-property name="mgwt.superdevmode_host" is-multi-valued="false" />
+	
+	<!-- generater to build util! -->
+	<generate-with class="com.googlecode.mgwt.ui.generator.SuperDevModeGenerator">
+		<when-type-assignable class="com.googlecode.mgwt.ui.client.util.impl.SuperDevModeHelper" />
+	</generate-with>
+	
+	
+	<!-- Addressbar Util -->
+	<replace-with class="com.googlecode.mgwt.ui.client.util.impl.AddressBarUtilNoOpImpl">
+		<when-type-is class="com.googlecode.mgwt.ui.client.util.AddressBarUtil" />
+	</replace-with>
+	
+	<replace-with class="com.googlecode.mgwt.ui.client.util.impl.AddressBarUtilIphoneImpl">
+		<when-type-is class="com.googlecode.mgwt.ui.client.util.AddressBarUtil" />
+		<all>
+			<when-property-is name="mgwt.os" value="iphone" />
+		</all>
+	</replace-with>
+	
+	<replace-with class="com.googlecode.mgwt.ui.client.util.impl.AddressBarUtilIphoneImpl">
+		<when-type-is class="com.googlecode.mgwt.ui.client.util.AddressBarUtil" />
+		<all>
+			<when-property-is name="mgwt.os" value="retina" />
+		</all>
+	</replace-with>
 	
 
 	<source path="client" />

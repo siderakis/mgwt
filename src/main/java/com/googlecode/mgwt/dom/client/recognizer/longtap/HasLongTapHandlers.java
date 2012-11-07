@@ -13,10 +13,23 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.googlecode.mgwt.dom.client.recognizer;
+package com.googlecode.mgwt.dom.client.recognizer.longtap;
 
-import com.google.gwt.event.shared.EventHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 
-public interface LongTapHandler extends EventHandler {
-	public void onLongTap(LongTapEvent event);
+/**
+ * A widget that implements this interface provides support for registering for
+ * {@link LongTapEvent}s
+ * 
+ * @author Daniel Kurka
+ * 
+ */
+public interface HasLongTapHandlers {
+	/**
+	 * Register for a {@link LongTapEvent}
+	 * 
+	 * @param handler the handler to register
+	 * @return the handler registration
+	 */
+	public HandlerRegistration addLongTapHandler(LongTapHandler handler);
 }

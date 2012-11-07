@@ -1,16 +1,14 @@
 /*
  * Copyright 2012 Daniel Kurka
  * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy of
- * the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
  * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
 package com.googlecode.mgwt.ui.client.widget;
@@ -36,6 +34,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.Widget;
+import com.googlecode.mgwt.collection.shared.LightArrayInt;
 import com.googlecode.mgwt.dom.client.event.orientation.OrientationChangeEvent;
 import com.googlecode.mgwt.dom.client.event.orientation.OrientationChangeHandler;
 import com.googlecode.mgwt.ui.client.MGWT;
@@ -45,320 +44,373 @@ import com.googlecode.mgwt.ui.client.widget.event.scroll.ScrollEndEvent;
 import com.googlecode.mgwt.ui.client.widget.event.scroll.ScrollRefreshEvent;
 import com.googlecode.mgwt.ui.client.widget.touch.TouchWidget;
 
+/**
+ * the carousel widget renders its children in a horizontal row. users can select a different child
+ * by swiping between them
+ * 
+ * @author Daniel Kurka
+ * 
+ */
 public class Carousel extends Composite implements HasWidgets, HasSelectionHandlers<Integer> {
 
-	private static class CarouselIndicatorContainer extends Composite {
-		private FlowPanel main;
-		private final CarouselCss css;
-		private ArrayList<CarouselIndicator> indicators;
-		private int selectedIndex;
-
-		public CarouselIndicatorContainer(CarouselCss css, int numberOfPages) {
-			if (numberOfPages < 0) {
-				throw new IllegalArgumentException();
-			}
-			this.css = css;
-			main = new FlowPanel();
-			initWidget(main);
+  private static class CarouselIndicatorContainer extends Composite {
+    private FlowPanel main;
+    private final CarouselCss css;
+    private ArrayList<CarouselIndicator> indicators;
+    private int selectedIndex;
+
+    public CarouselIndicatorContainer(CarouselCss css, int numberOfPages) {
+      if (numberOfPages < 0) {
+        throw new IllegalArgumentException();
+      }
+      this.css = css;
+      main = new FlowPanel();
+      initWidget(main);
+
+      main.addStyleName(this.css.indicatorContainer());
+
+      indicators = new ArrayList<Carousel.CarouselIndicator>(numberOfPages);
+      selectedIndex = 0;
+
+      for (int i = 0; i < numberOfPages; i++) {
+        CarouselIndicator indicator = new CarouselIndicator(css);
+        indicators.add(indicator);
+        main.add(indicator);
+
+      }
+
+      setSelectedIndex(selectedIndex);
+    }
+
+    public void setSelectedIndex(int index) {
+      if (indicators.isEmpty()) {
+        selectedIndex = -1;
+        return;
+      }
+      if (selectedIndex != -1) {
+        indicators.get(selectedIndex).setActive(false);
+      }
+      selectedIndex = index;
+      if (selectedIndex != -1) {
+        indicators.get(selectedIndex).setActive(true);
+
+      }
+    }
+  }
+
+  private static class CarouselIndicator extends TouchWidget {
+    private final CarouselCss css;
+
+    public CarouselIndicator(CarouselCss css) {
+      this.css = css;
+      setElement(DOM.createDiv());
+
+      addStyleName(css.indicator());
+
+    }
+
+    public void setActive(boolean active) {
+      if (active) {
+        addStyleName(css.indicatorActive());
+      } else {
+        removeStyleName(css.indicatorActive());
+      }
+    }
+  }
 
-			main.addStyleName(this.css.indicatorContainer());
+  private static class WidgetHolder extends FlowPanel {
 
-			indicators = new ArrayList<Carousel.CarouselIndicator>(numberOfPages);
-			selectedIndex = 0;
+    public WidgetHolder(CarouselCss css) {
+      addStyleName(css.carouselHolder());
+    }
 
-			for (int i = 0; i < numberOfPages; i++) {
-				CarouselIndicator indicator = new CarouselIndicator(css);
-				indicators.add(indicator);
-				main.add(indicator);
+    @Override
+    public void add(Widget w) {
+      super.add(w);
+      if (w instanceof ScrollPanel) {
+        w.addStyleName(MGWTStyle.getTheme().getMGWTClientBundle().getLayoutCss().fillPanelExpandChild());
+      }
+    }
 
-			}
+  }
 
-			setSelectedIndex(selectedIndex);
-		}
+  private FlowPanel main;
+  private final CarouselCss css;
+  private ScrollPanel scrollPanel;
+  private FlowPanel container;
+  private CarouselIndicatorContainer carouselIndicatorContainer;
 
-		public void setSelectedIndex(int index) {
-			if (selectedIndex != -1) {
-				indicators.get(selectedIndex).setActive(false);
-			}
-			selectedIndex = index;
-			if (selectedIndex != -1) {
-				indicators.get(selectedIndex).setActive(true);
+  private int currentPage;
 
-			}
-		}
-	}
+  private Map<Widget, Widget> childToHolder;
+  private com.google.web.bindery.event.shared.HandlerRegistration refreshHandler;
 
-	private static class CarouselIndicator extends TouchWidget {
-		private final CarouselCss css;
+  private static final CarouselImpl IMPL = GWT.create(CarouselImpl.class);
 
-		public CarouselIndicator(CarouselCss css) {
-			this.css = css;
-			setElement(DOM.createDiv());
+  /**
+   * Construct a carousel widget with the default css
+   */
+  public Carousel() {
+    this(MGWTStyle.getTheme().getMGWTClientBundle().getCarouselCss());
+  }
 
-			addStyleName(css.indicator());
+  /**
+   * Construct a carousel widget with a given css
+   * 
+   * @param css the css to use
+   */
+  public Carousel(CarouselCss css) {
+    this.css = css;
+    this.css.ensureInjected();
 
-		}
+    childToHolder = new HashMap<Widget, Widget>();
+    main = new FlowPanel();
+    initWidget(main);
 
-		public void setActive(boolean active) {
-			if (active) {
-				addStyleName(css.indicatorActive());
-			} else {
-				removeStyleName(css.indicatorActive());
-			}
-		}
-	}
+    main.addStyleName(css.carousel());
 
-	private static class WidgetHolder extends FlowPanel {
+    scrollPanel = new ScrollPanel();
+    scrollPanel.addStyleName(css.carouselScroller());
 
-		public WidgetHolder(CarouselCss css) {
-			addStyleName(css.carouselHolder());
-		}
+    main.add(scrollPanel);
 
-		@Override
-		public void add(Widget w) {
-			super.add(w);
-			if (w instanceof ScrollPanel) {
-				w.addStyleName(MGWTStyle.getTheme().getMGWTClientBundle().getLayoutCss().fillPanelExpandChild());
-			}
-		}
+    container = new FlowPanel();
+    container.addStyleName(css.carouselContainer());
 
-	}
+    scrollPanel.setWidget(container);
 
-	private FlowPanel main;
-	private final CarouselCss css;
-	private ScrollPanel scrollPanel;
-	private FlowPanel container;
-	private CarouselIndicatorContainer carouselIndicatorContainer;
+    scrollPanel.setSnap(true);
+    scrollPanel.setMomentum(false);
+    scrollPanel.setShowScrollBarX(false);
+    scrollPanel.setShowScrollBarY(false);
+    scrollPanel.setScrollingEnabledY(true);
+    scrollPanel.setAutoHandleResize(false);
 
-	private int currentPage;
+    currentPage = 0;
 
-	private Map<Widget, Widget> childToHolder;
-	private com.google.web.bindery.event.shared.HandlerRegistration refreshHandler;
+    scrollPanel.addScrollEndHandler(new ScrollEndEvent.Handler() {
 
-	private static final CarouselImpl IMPL = GWT.create(CarouselImpl.class);
+      @Override
+      public void onScrollEnd(ScrollEndEvent event) {
+        int page = scrollPanel.getCurrentPageX();
 
-	public Carousel() {
-		this(MGWTStyle.getTheme().getMGWTClientBundle().getCarouselCss());
-	}
+        carouselIndicatorContainer.setSelectedIndex(page);
+        currentPage = page;
+        SelectionEvent.fire(Carousel.this, currentPage);
 
-	public Carousel(CarouselCss css) {
-		this.css = css;
-		this.css.ensureInjected();
+      }
+    });
 
-		childToHolder = new HashMap<Widget, Widget>();
-		main = new FlowPanel();
-		initWidget(main);
+    MGWT.addOrientationChangeHandler(new OrientationChangeHandler() {
 
-		main.addStyleName(css.carousel());
+      @Override
+      public void onOrientationChanged(OrientationChangeEvent event) {
+        Scheduler.get().scheduleDeferred(new ScheduledCommand() {
 
-		scrollPanel = new ScrollPanel();
-		scrollPanel.addStyleName(css.carouselScroller());
+          @Override
+          public void execute() {
+            refresh();
 
-		main.add(scrollPanel);
+          }
+        });
 
-		container = new FlowPanel();
-		container.addStyleName(css.carouselContainer());
+      }
+    });
 
-		scrollPanel.setWidget(container);
+    addSelectionHandler(new SelectionHandler<Integer>() {
 
-		scrollPanel.setSnap(true);
-		scrollPanel.setMomentum(false);
-		scrollPanel.setShowScrollBarX(false);
-		scrollPanel.setShowScrollBarY(false);
-		scrollPanel.setScrollingEnabledY(true);
-		scrollPanel.setAutoHandleResize(false);
+      @Override
+      public void onSelection(SelectionEvent<Integer> event) {
 
-		currentPage = 0;
+        carouselIndicatorContainer.setSelectedIndex(currentPage);
 
-		scrollPanel.addScrollEndHandler(new ScrollEndEvent.Handler() {
+      }
+    });
 
-			@Override
-			public void onScrollEnd(ScrollEndEvent event) {
-				int page;
+    if (MGWT.getOsDetection().isDesktop()) {
+      Window.addResizeHandler(new ResizeHandler() {
 
-				page = scrollPanel.getCurrentPageX();
+        @Override
+        public void onResize(ResizeEvent event) {
+          Scheduler.get().scheduleDeferred(new ScheduledCommand() {
 
-				carouselIndicatorContainer.setSelectedIndex(page);
-				currentPage = page;
-				SelectionEvent.fire(Carousel.this, currentPage);
+            @Override
+            public void execute() {
+              refresh();
 
-			}
-		});
+            }
+          });
 
-		MGWT.addOrientationChangeHandler(new OrientationChangeHandler() {
+        }
+      });
+    }
 
-			@Override
-			public void onOrientationChanged(OrientationChangeEvent event) {
-				Scheduler.get().scheduleDeferred(new ScheduledCommand() {
+  }
 
-					@Override
-					public void execute() {
-						refresh();
+  @Override
+  public void add(Widget w) {
 
-					}
-				});
+    WidgetHolder widgetHolder = new WidgetHolder(css);
+    widgetHolder.add(w);
 
-			}
-		});
+    childToHolder.put(w, widgetHolder);
 
-		addSelectionHandler(new SelectionHandler<Integer>() {
+    container.add(widgetHolder);
 
-			@Override
-			public void onSelection(SelectionEvent<Integer> event) {
+  }
 
-				carouselIndicatorContainer.setSelectedIndex(currentPage);
+  @Override
+  public void clear() {
+    container.clear();
+    childToHolder.clear();
 
-			}
-		});
+  }
 
-		if (MGWT.getOsDetection().isDesktop()) {
-			Window.addResizeHandler(new ResizeHandler() {
+  @Override
+  public Iterator<Widget> iterator() {
+    Set<Widget> keySet = childToHolder.keySet();
+    return keySet.iterator();
+  }
 
-				@Override
-				public void onResize(ResizeEvent event) {
-					Scheduler.get().scheduleDeferred(new ScheduledCommand() {
+  @Override
+  public boolean remove(Widget w) {
+    Widget holder = childToHolder.remove(w);
+    if (holder != null) {
+      return container.remove(holder);
+    }
+    return false;
 
-						@Override
-						public void execute() {
-							refresh();
+  }
 
-						}
-					});
+  @Override
+  protected void onAttach() {
+    super.onAttach();
+    refresh();
+  }
 
-				}
-			});
-		}
+  /**
+   * refresh the carousel widget, this is necessary after changing child elements
+   */
+  public void refresh() {
 
-	}
+    IMPL.adjust(main, container);
 
-	@Override
-	public void add(Widget w) {
+    scrollPanel.setScrollingEnabledX(true);
+    scrollPanel.setScrollingEnabledY(false);
 
-		WidgetHolder widgetHolder = new WidgetHolder(css);
-		widgetHolder.add(w);
+    scrollPanel.setShowScrollBarX(false);
+    scrollPanel.setShowScrollBarY(false);
 
-		childToHolder.put(w, widgetHolder);
+    if (carouselIndicatorContainer != null) {
+      carouselIndicatorContainer.removeFromParent();
 
-		container.add(widgetHolder);
+    }
 
-	}
+    int widgetCount = container.getWidgetCount();
 
-	@Override
-	public void clear() {
-		container.clear();
-		childToHolder.clear();
+    carouselIndicatorContainer = new CarouselIndicatorContainer(css, widgetCount);
 
-	}
+    main.add(carouselIndicatorContainer);
 
-	@Override
-	public Iterator<Widget> iterator() {
-		Set<Widget> keySet = childToHolder.keySet();
-		return keySet.iterator();
-	}
+    if (currentPage >= widgetCount) {
+      currentPage = widgetCount - 1;
+    }
 
-	@Override
-	public boolean remove(Widget w) {
-		Widget holder = childToHolder.remove(w);
-		if (holder != null) {
-			return container.remove(w);
-		}
-		return false;
+    carouselIndicatorContainer.setSelectedIndex(currentPage);
 
-	}
+    scrollPanel.refresh();
 
-	@Override
-	protected void onAttach() {
-		super.onAttach();
-		refresh();
-	}
+    refreshHandler = scrollPanel.addScrollRefreshHandler(new ScrollRefreshEvent.Handler() {
 
-	public void refresh() {
+      @Override
+      public void onScrollRefresh(ScrollRefreshEvent event) {
+        refreshHandler.removeHandler();
+        refreshHandler = null;
 
-		IMPL.adjust(main, container);
+        scrollPanel.scrollToPage(currentPage, 0, 0);
 
-		scrollPanel.setScrollingEnabledX(true);
-		scrollPanel.setScrollingEnabledY(false);
+      }
+    });
 
-		scrollPanel.setShowScrollBarX(false);
-		scrollPanel.setShowScrollBarY(false);
+  }
 
-		if (carouselIndicatorContainer != null) {
-			carouselIndicatorContainer.removeFromParent();
+  public void setSelectedPage(int index) {
+    LightArrayInt pagesX = scrollPanel.getPagesX();
+    if (index < 0 || index >= pagesX.length()) {
+      throw new IllegalArgumentException("invalid value for index: " + index);
+    }
+    currentPage = index;
+    scrollPanel.scrollToPage(index, 0, 300);
+  }
 
-		}
+  @Override
+  public HandlerRegistration addSelectionHandler(SelectionHandler<Integer> handler) {
+    return addHandler(handler, SelectionEvent.getType());
+  }
 
-		int widgetCount = container.getWidgetCount();
+  public ScrollPanel getScrollPanel() {
+    return scrollPanel;
+  }
 
-		carouselIndicatorContainer = new CarouselIndicatorContainer(css, widgetCount);
+  /**
+   * 
+   * @author Daniel Kurka
+   * 
+   */
+  public static interface CarouselImpl {
 
-		main.add(carouselIndicatorContainer);
+    /**
+     * 
+     * @param main
+     * @param container
+     */
+    void adjust(FlowPanel main, FlowPanel container);
 
-		if (currentPage >= widgetCount) {
-			currentPage = widgetCount - 1;
-		}
+  }
 
-		carouselIndicatorContainer.setSelectedIndex(currentPage);
+  /**
+   * 
+   * @author Daniel Kurka
+   * 
+   */
+  public static class CarouselImplSafari implements CarouselImpl {
 
-		scrollPanel.refresh();
+    @Override
+    public void adjust(FlowPanel main, FlowPanel container) {
+      int widgetCount = container.getWidgetCount();
 
-		refreshHandler = scrollPanel.addScrollRefreshHandler(new ScrollRefreshEvent.Handler() {
+      double sizeFactor = 100d / widgetCount;
 
-			@Override
-			public void onScrollRefresh(ScrollRefreshEvent event) {
-				refreshHandler.removeHandler();
-				refreshHandler = null;
+      for (int i = 0; i < widgetCount; i++) {
+        container.getWidget(i).setWidth(sizeFactor + "%");
+      }
 
-				scrollPanel.scrollToPage(currentPage, 0, 0);
+      container.setWidth((widgetCount * 100) + "%");
 
-			}
-		});
+    }
 
-	}
+  }
 
-	@Override
-	public HandlerRegistration addSelectionHandler(SelectionHandler<Integer> handler) {
-		return addHandler(handler, SelectionEvent.getType());
-	}
+  /**
+   * 
+   * @author Daniel Kurka
+   * 
+   */
+  public static class CarouselImplGecko implements CarouselImpl {
 
-	public static interface CarouselImpl {
+    @Override
+    public void adjust(FlowPanel main, FlowPanel container) {
+      int widgetCount = container.getWidgetCount();
+      int offsetWidth = main.getOffsetWidth();
 
-		void adjust(FlowPanel main, FlowPanel container);
+      container.setWidth(widgetCount * offsetWidth + "px");
 
-	}
+      for (int i = 0; i < widgetCount; i++) {
+        container.getWidget(i).setWidth(offsetWidth + "px");
+      }
 
-	public static class CarouselImplSafari implements CarouselImpl {
+    }
 
-		@Override
-		public void adjust(FlowPanel main, FlowPanel container) {
-			int widgetCount = container.getWidgetCount();
-
-			double sizeFactor = 100d / widgetCount;
-
-			for (int i = 0; i < widgetCount; i++) {
-				container.getWidget(i).setWidth(sizeFactor + "%");
-			}
-
-			container.setWidth((widgetCount * 100) + "%");
-
-		}
-
-	}
-
-	public static class CarouselImplGecko implements CarouselImpl {
-
-		@Override
-		public void adjust(FlowPanel main, FlowPanel container) {
-			int widgetCount = container.getWidgetCount();
-			int offsetWidth = main.getOffsetWidth();
-
-			container.setWidth(widgetCount * offsetWidth + "px");
-
-			for (int i = 0; i < widgetCount; i++) {
-				container.getWidget(i).setWidth(offsetWidth + "px");
-			}
-
-		}
-
-	}
+  }
 
 }

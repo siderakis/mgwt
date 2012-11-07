@@ -29,6 +29,9 @@ import com.googlecode.mgwt.dom.client.event.touch.TouchEvent;
 import com.googlecode.mgwt.dom.client.event.touch.TouchHandler;
 import com.googlecode.mgwt.dom.client.event.touch.TouchMoveHandler;
 import com.googlecode.mgwt.dom.client.event.touch.TouchStartHandler;
+import com.googlecode.mgwt.dom.client.recognizer.longtap.HasLongTapHandlers;
+import com.googlecode.mgwt.dom.client.recognizer.longtap.LongTapEvent;
+import com.googlecode.mgwt.dom.client.recognizer.longtap.LongTapHandler;
 import com.googlecode.mgwt.dom.client.recognizer.pinch.HasPinchHandlers;
 import com.googlecode.mgwt.dom.client.recognizer.pinch.PinchEvent;
 import com.googlecode.mgwt.dom.client.recognizer.pinch.PinchHandler;
@@ -47,12 +50,15 @@ import com.googlecode.mgwt.dom.client.recognizer.swipe.SwipeStartHandler;
  * 
  */
 
-public class TouchPanel extends FlowPanel implements HasTouchHandlers, HasTapHandlers, HasPinchHandlers, HasSwipeHandlers {
+public class TouchPanel extends FlowPanel implements HasTouchHandlers, HasTapHandlers, HasPinchHandlers, HasSwipeHandlers, HasLongTapHandlers {
 
 	private static final TouchWidgetImpl impl = GWT.create(TouchWidgetImpl.class);
 
 	protected final GestureUtility gestureUtility;
 
+  /**
+   * Construct a touch panel
+   */
 	public TouchPanel() {
 		gestureUtility = new GestureUtility(this);
 	}
@@ -146,6 +152,12 @@ public class TouchPanel extends FlowPanel implements HasTouchHandlers, HasTapHan
 	public HandlerRegistration addPinchHandler(PinchHandler handler) {
 		gestureUtility.ensurePinchRecognizer(this);
 		return addHandler(handler, PinchEvent.getType());
+	}
+
+	@Override
+	public HandlerRegistration addLongTapHandler(LongTapHandler handler) {
+		gestureUtility.ensureLongTapHandler();
+		return addHandler(handler, LongTapEvent.getType());
 	}
 
 }

@@ -44,14 +44,13 @@ import com.googlecode.mgwt.mvp.client.AnimatableDisplay;
 import com.googlecode.mgwt.mvp.client.Animation;
 import com.googlecode.mgwt.mvp.client.AnimationEndCallback;
 import com.googlecode.mgwt.ui.client.theme.base.DialogCss;
-import com.googlecode.mgwt.ui.client.widget.touch.GestureUtility;
+import com.googlecode.mgwt.ui.client.util.MGWTUtil;
 import com.googlecode.mgwt.ui.client.widget.touch.TouchDelegate;
 
 /**
  * Baseclass for creating dialogs that are animated
  * 
  * @author Daniel Kurka
- * @version $Id: $
  */
 public abstract class AnimatableDialogBase implements HasWidgets, HasTouchHandlers, HasTapHandlers, Dialog {
 
@@ -120,7 +119,6 @@ public abstract class AnimatableDialogBase implements HasWidgets, HasTouchHandle
 	private boolean hideOnBackgroundClick;
 	private boolean isVisible;
 	private TouchDelegate touchDelegate;
-	private GestureUtility gestureUtility;
 
 	/**
 	 * Create an instance of an animated dialog
@@ -273,6 +271,8 @@ public abstract class AnimatableDialogBase implements HasWidgets, HasTouchHandle
 			public void onAnimationEnd() {
 				HasWidgets panel = getPanelToOverlay();
 				panel.remove(display.asWidget());
+				//see issue 247 => http://code.google.com/p/mgwt/issues/detail?id=247
+				MGWTUtil.forceFullRepaint();
 
 			}
 		});

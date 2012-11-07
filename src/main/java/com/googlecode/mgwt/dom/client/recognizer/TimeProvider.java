@@ -15,6 +15,13 @@
  */
 package com.googlecode.mgwt.dom.client.recognizer;
 
+/**
+ * A simple interface for making classes testable that depend on
+ * System.currentTimeMillis
+ * 
+ * @author Daniel Kurka
+ * 
+ */
 public interface TimeProvider {
 	public long getTime();
 }

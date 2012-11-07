@@ -15,8 +15,25 @@
  */
 package com.googlecode.mgwt.dom.client.recognizer;
 
-import com.google.web.bindery.event.shared.HandlerRegistration;
+import com.google.gwt.event.shared.GwtEvent;
+import com.google.gwt.event.shared.HasHandlers;
 
-public interface HasGestureRecognizer {
-	public HandlerRegistration addGestureRecognizer(GestureHandler handler);
+/**
+ * Propagate events to a source
+ * 
+ * @author Daniel Kurka
+ * 
+ */
+public class EventPropagatorStandardImpl implements EventPropagator {
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.googlecode.mgwt.dom.client.recognizer.EventPropagator#fireEvent(com.google.gwt.event.shared.HasHandlers, com.google.gwt.event.shared.GwtEvent)
+	 */
+	@Override
+	public void fireEvent(HasHandlers source, GwtEvent<?> event) {
+		source.fireEvent(event);
+
+	}
+
 }

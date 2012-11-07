@@ -22,6 +22,7 @@
 @if user.agent gecko1_8 {
 	.mgwt-Button {
 		\-moz-border-radius: 6px;
+		border-radius: 6px;
 		background-image: literal('-webkit-linear-gradient(top, rgba(234,234,234,0.90), rgba(195,195,195,0.70) 50%, rgba(166,166,166,0.70) 51%, rgba(167,167,167,0.80))');
 	}
 	.mgwt-Button-active {
@@ -73,4 +74,11 @@
 	.mgwt-Button-confirm.mgwt-Button-active {
 		background-image: literal('-moz-linear-gradient(top, rgba(80,200,80,1), rgba(50,150,0,1) 50%, rgba(0,100,0,1) 51%, rgba(0,80,0,1))');
 	}
+}
+
+.mgwt-Button-round {
+	border-bottom-left-radius: 16px 16px;
+	border-bottom-right-radius: 16px 16px;
+	border-top-left-radius: 16px 16px;
+	border-top-right-radius: 16px 16px;
 }

@@ -16,35 +16,70 @@
 package com.googlecode.mgwt.dom.client.recognizer.swipe;
 
 import com.google.gwt.event.shared.GwtEvent;
+import com.googlecode.mgwt.dom.client.event.touch.Touch;
 
+/**
+ * A {@link SwipeStartEvent} is fired when the user moves his finger over a
+ * certain amount on the display
+ * 
+ * @author Daniel Kurka
+ * 
+ */
 public class SwipeStartEvent extends SwipeEvent<SwipeStartHandler> {
 
 	private final static GwtEvent.Type<SwipeStartHandler> TYPE = new Type<SwipeStartHandler>();
 	private final int distance;
+	private final Touch touch;
 
 	public static GwtEvent.Type<SwipeStartHandler> getType() {
 		return TYPE;
 	}
 
-	public SwipeStartEvent(int distance, SwipeEvent.DIRECTION direction) {
+	/**
+	 * Construct a {@link SwipeStartEvent}
+	 * 
+	 * @param distance the distance the finger already moved
+	 * @param j
+	 * @param i
+	 * @param direction the direction of the finger
+	 */
+	public SwipeStartEvent(Touch touch, int distance, SwipeEvent.DIRECTION direction) {
 		super(direction);
+		this.touch = touch;
 		this.distance = distance;
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.google.gwt.event.shared.GwtEvent#getAssociatedType()
+	 */
 	@Override
 	public com.google.gwt.event.shared.GwtEvent.Type<SwipeStartHandler> getAssociatedType() {
 		return TYPE;
 	}
 
+	/**
+	 * The distance the finger moved before the event occured
+	 * 
+	 * @return the distance in px
+	 */
 	public int getDistance() {
 		return distance;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.google.gwt.event.shared.GwtEvent#dispatch(com.google.gwt.event.shared.EventHandler)
+	 */
 	@Override
 	protected void dispatch(SwipeStartHandler handler) {
 		handler.onSwipeStart(this);
 
+	}
+
+	public Touch getTouch() {
+		return touch;
 	}
 
 }

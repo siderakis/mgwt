@@ -13,17 +13,21 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.googlecode.mgwt.dom.client.recognizer;
+package com.googlecode.mgwt.dom.client.recognizer.longtap;
 
-import com.google.gwt.event.shared.GwtEvent;
-import com.google.gwt.event.shared.HasHandlers;
+import com.google.gwt.event.shared.EventHandler;
 
-public class EventPropagatorDesktopImpl implements EventPropagator {
-
-	@Override
-	public void fireEvent(HasHandlers source, GwtEvent<?> event) {
-		source.fireEvent(event);
-
-	}
-
+/**
+ * A Handler for {@link LongTapEvent}s
+ * 
+ * @author Daniel Kurka
+ * 
+ */
+public interface LongTapHandler extends EventHandler {
+	/**
+	 * Called when an event is fired
+	 * 
+	 * @param event the event
+	 */
+	public void onLongTap(LongTapEvent event);
 }
