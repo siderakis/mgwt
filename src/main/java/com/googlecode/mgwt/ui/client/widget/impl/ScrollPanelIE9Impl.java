@@ -29,9 +29,6 @@ import com.googlecode.mgwt.dom.client.event.touch.TouchStartEvent;
 import com.googlecode.mgwt.ui.client.MGWT;
 import com.googlecode.mgwt.ui.client.MGWTStyle;
 import com.googlecode.mgwt.ui.client.theme.base.ScrollPanelCss;
-import com.googlecode.mgwt.ui.client.util.FeatureDetection;
-import com.googlecode.mgwt.ui.client.widget.base.Scrollbar;
-import com.googlecode.mgwt.ui.client.widget.base.Scrollbar.Orientation;
 import com.googlecode.mgwt.ui.client.widget.touch.TouchPanel;
 
 public class ScrollPanelIE9Impl extends ScrollPanelImpl {
@@ -78,10 +75,6 @@ public class ScrollPanelIE9Impl extends ScrollPanelImpl {
 
   private boolean has3d;
 
-  private Scrollbar hScrollbar;
-
-  private Scrollbar vScrollbar;
-
   private HandlerRegistration transEndHandler;
 
   protected final ScrollPanelCss css;
@@ -120,7 +113,7 @@ public class ScrollPanelIE9Impl extends ScrollPanelImpl {
 
     touchObserver = new TouchObserver();
 
-    has3d = FeatureDetection.has3d();
+    has3d = false;
 
   }
 
@@ -132,13 +125,13 @@ public class ScrollPanelIE9Impl extends ScrollPanelImpl {
     if (widgetToScroll == null) {
       return;
     }
-    if (hScrollbar != null) {
-      main.remove(hScrollbar);
-    }
-
-    if (vScrollbar != null) {
-      main.remove(vScrollbar);
-    }
+    // if (hScrollbar != null) {
+    // main.remove(hScrollbar);
+    // }
+    //
+    // if (vScrollbar != null) {
+    // main.remove(vScrollbar);
+    // }
 
     Scheduler.get().scheduleDeferred(new Scheduler.ScheduledCommand() {
 
@@ -146,19 +139,19 @@ public class ScrollPanelIE9Impl extends ScrollPanelImpl {
       public void execute() {
 
         if (scrollingEnabledX && getWidgetToScrollWidth() > 0) {
-          hScrollbar =
-              new Scrollbar(css, Orientation.HORIZONTAL, has3d, main.getOffsetWidth(),
-                  getWidgetToScrollWidth());
-          if (getClientWidth(main.getElement()) < getWidgetToScrollWidth())
-            main.add(hScrollbar);
+          // hScrollbar =
+          // new Scrollbar(css, Orientation.HORIZONTAL, has3d, main.getOffsetWidth(),
+          // getWidgetToScrollWidth());
+          // if (getClientWidth(main.getElement()) < getWidgetToScrollWidth())
+          // main.add(hScrollbar);
         }
 
         if (scrollingEnabledY && getWidgetToScrollHeight() > 0) {
-          vScrollbar =
-              new Scrollbar(css, Orientation.VERTICAL, has3d, main.getOffsetHeight(),
-                  getWidgetToScrollHeight());
-          if (getClientHeight(main.getElement()) < getWidgetToScrollHeight())
-            main.add(vScrollbar);
+          // vScrollbar =
+          // new Scrollbar(css, Orientation.VERTICAL, has3d, main.getOffsetHeight(),
+          // getWidgetToScrollHeight());
+          // if (getClientHeight(main.getElement()) < getWidgetToScrollHeight())
+          // main.add(vScrollbar);
         }
 
       }
@@ -246,13 +239,10 @@ public class ScrollPanelIE9Impl extends ScrollPanelImpl {
       main.add(w);
 
       if (isAttached()) {
-        transEndHandler =
-            widgetToScroll
-                .addDomHandler(new TransistionEndListener(), TransitionEndEvent.getType());
+        transEndHandler = widgetToScroll.addDomHandler(new TransistionEndListener(), TransitionEndEvent.getType());
         updateScrollBars();
 
-        mouseWheelHandlerRegistration =
-            main.addDomHandler(new MouseWheelHandlerImplementation(), MouseWheelEvent.getType());
+        mouseWheelHandlerRegistration = main.addDomHandler(new MouseWheelHandlerImplementation(), MouseWheelEvent.getType());
 
       }
       widgetToScroll.addStyleName(css.container());
@@ -301,15 +291,14 @@ public class ScrollPanelIE9Impl extends ScrollPanelImpl {
   protected void onAttach() {
     super.onAttach();
 
-    orientationHandlerRegistration =
-        MGWT.addOrientationChangeHandler(new OrientationChangeHandler() {
+    orientationHandlerRegistration = MGWT.addOrientationChangeHandler(new OrientationChangeHandler() {
 
-          @Override
-          public void onOrientationChanged(OrientationChangeEvent event) {
-            refresh();
+      @Override
+      public void onOrientationChanged(OrientationChangeEvent event) {
+        refresh();
 
-          }
-        });
+      }
+    });
 
     touchRegistration = main.addTouchHandler(touchObserver);
 
@@ -319,8 +308,7 @@ public class ScrollPanelIE9Impl extends ScrollPanelImpl {
       // transEndHandler = widgetToScroll.addDomHandler(new
       // TransistionEndListener(), TransitionEndEvent.getType());
 
-      mouseWheelHandlerRegistration =
-          main.addDomHandler(new MouseWheelHandlerImplementation(), MouseWheelEvent.getType());
+      mouseWheelHandlerRegistration = main.addDomHandler(new MouseWheelHandlerImplementation(), MouseWheelEvent.getType());
 
     }
     refresh();
@@ -511,17 +499,13 @@ public class ScrollPanelIE9Impl extends ScrollPanelImpl {
       if (touchTime < 300 && momentum) {
 
         if (scrollingEnabledX && getWidgetToScrollWidth() > getClientWidth(main.getElement())) {
-          Momentum m =
-              calculateMomentum(position_x - scrollStartX, scrollTime, -position_x, position_x
-                  + getWidgetToScrollWidth() - getClientWidth(main.getElement()));
+          Momentum m = calculateMomentum(position_x - scrollStartX, scrollTime, -position_x, position_x + getWidgetToScrollWidth() - getClientWidth(main.getElement()));
           newDuration = Math.max(m.getTime(), newDuration);
           newPosX = position_x + m.getDist();
         }
 
         if (scrollingEnabledY && getWidgetToScrollHeight() > getClientHeight(main.getElement())) {
-          Momentum m =
-              calculateMomentum(position_y - scrollStartY, scrollTime, -position_y, position_y
-                  + getWidgetToScrollHeight() - getClientHeight(main.getElement()));
+          Momentum m = calculateMomentum(position_y - scrollStartY, scrollTime, -position_y, position_y + getWidgetToScrollHeight() - getClientHeight(main.getElement()));
           newDuration = Math.max(m.getTime(), newDuration);
           newPosY = position_y + m.getDist();
 
@@ -566,23 +550,23 @@ public class ScrollPanelIE9Impl extends ScrollPanelImpl {
       }
     }.schedule(1);
 
-    if (scrollingEnabledX && hScrollbar != null) {
-      hScrollbar.setPosition(newPosX);
-    }
-    if (scrollingEnabledY && vScrollbar != null) {
-      vScrollbar.setPosition(newPosY);
-    }
+    // if (scrollingEnabledX && hScrollbar != null) {
+    // hScrollbar.setPosition(newPosX);
+    // }
+    // if (scrollingEnabledY && vScrollbar != null) {
+    // vScrollbar.setPosition(newPosY);
+    // }
 
   }
 
   private void setTransistionTime(int milliseconds) {
 
-    if (scrollingEnabledX && hScrollbar != null) {
-      hScrollbar.setTransitionTime(milliseconds);
-    }
-    if (scrollingEnabledY && vScrollbar != null) {
-      vScrollbar.setTransitionTime(milliseconds);
-    }
+    // if (scrollingEnabledX && hScrollbar != null) {
+    // hScrollbar.setTransitionTime(milliseconds);
+    // }
+    // if (scrollingEnabledY && vScrollbar != null) {
+    // vScrollbar.setTransitionTime(milliseconds);
+    // }
 
   }
 
@@ -640,12 +624,12 @@ public class ScrollPanelIE9Impl extends ScrollPanelImpl {
     if (resetX != position_x || resetY != position_y) {
       scrollTo(resetX, resetY, 300);
     } else {
-      if (scrollingEnabledX && hScrollbar != null) {
-        hScrollbar.hide();
-      }
-      if (scrollingEnabledY && vScrollbar != null) {
-        vScrollbar.hide();
-      }
+      // if (scrollingEnabledX && hScrollbar != null) {
+      // hScrollbar.hide();
+      // }
+      // if (scrollingEnabledY && vScrollbar != null) {
+      // vScrollbar.hide();
+      // }
 
     }
 
