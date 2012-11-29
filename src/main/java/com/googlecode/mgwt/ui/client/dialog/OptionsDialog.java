@@ -23,7 +23,7 @@ import com.googlecode.mgwt.ui.client.theme.base.DialogCss;
 /**
  * A simple options dialog
  * 
- * This dialog should offer a number of choises, represented by a number of buttons
+ * This dialog should offer a number of choices, represented by a number of buttons
  * 
  * @author Daniel Kurka
  */
