@@ -62,8 +62,8 @@ public abstract class ButtonBase extends TouchWidget implements HasText {
 
       @Override
       public void onTouchCanceled(TouchCancelEvent event) {
-        event.stopPropagation();
-        event.preventDefault();
+        //event.stopPropagation();
+        //event.preventDefault();
         removeStyleName(active);
         if (MGWT.getOsDetection().isDesktop()) {
           DOM.releaseCapture(getElement());
@@ -72,8 +72,8 @@ public abstract class ButtonBase extends TouchWidget implements HasText {
 
       @Override
       public void onTouchEnd(TouchEndEvent event) {
-        event.stopPropagation();
-        event.preventDefault();
+        //event.stopPropagation();
+        //event.preventDefault();
         removeStyleName(active);
         if (MGWT.getOsDetection().isDesktop()) {
           DOM.releaseCapture(getElement());
@@ -82,14 +82,14 @@ public abstract class ButtonBase extends TouchWidget implements HasText {
 
       @Override
       public void onTouchMove(TouchMoveEvent event) {
-        event.preventDefault();
-        event.stopPropagation();
+        //event.preventDefault();
+        //event.stopPropagation();
       }
 
       @Override
       public void onTouchStart(TouchStartEvent event) {
-        event.stopPropagation();
-        event.preventDefault();
+        //event.stopPropagation();
+        //event.preventDefault();
         addStyleName(active);
         if (MGWT.getOsDetection().isDesktop()) {
           DOM.setCapture(getElement());
