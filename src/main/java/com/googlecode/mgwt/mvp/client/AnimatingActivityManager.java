@@ -30,7 +30,6 @@ import com.google.gwt.event.shared.UmbrellaException;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceChangeEvent;
 import com.google.gwt.place.shared.PlaceChangeRequestEvent;
-import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.web.bindery.event.shared.EventBus;
@@ -103,6 +102,8 @@ public class AnimatingActivityManager implements PlaceChangeEvent.Handler,
   private boolean fireAnimationEvents;
   private LinkedList<PlaceChangeEvent> placeChangeStack = new LinkedList<PlaceChangeEvent>();
 
+  private boolean stopTouchEventPropagationDuringAnimations = true;
+
   /**
    * Create an ActivityManager. Next call {@link #setDisplay}.
    * 
@@ -165,8 +166,9 @@ public class AnimatingActivityManager implements PlaceChangeEvent.Handler,
        * firing as a side effect of its tear down
        */
       stopperedEventBus.removeHandlers();
-      stopTouchEventPropagation(true);
-
+      if (stopTouchEventPropagationDuringAnimations) {
+        stopTouchEventPropagation(true);
+      }
       try {
         currentActivity.onStop();
       } catch (Throwable t) {
@@ -278,7 +280,9 @@ public class AnimatingActivityManager implements PlaceChangeEvent.Handler,
 
     if (animation == null) {
       AnimatingActivityManager.this.onAnimationEnd();
-      stopTouchEventPropagation(false);
+      if (stopTouchEventPropagationDuringAnimations) {
+        stopTouchEventPropagation(false);
+      }
       return;
     }
 
@@ -287,7 +291,9 @@ public class AnimatingActivityManager implements PlaceChangeEvent.Handler,
       @Override
       public void onAnimationEnd() {
         AnimatingActivityManager.this.onAnimationEnd();
-        stopTouchEventPropagation(false);
+        if (stopTouchEventPropagationDuringAnimations) {
+          stopTouchEventPropagation(false);
+        }
       }
     });
 
@@ -356,10 +362,9 @@ public class AnimatingActivityManager implements PlaceChangeEvent.Handler,
     }
   }
 
-  public static final boolean stopPropagationEventHandler(NativeEvent event) {
+  public static final void stopPropagationEventHandler(NativeEvent event) {
     event.stopPropagation();
     event.preventDefault();
-    return false;
   }
 
   /** Stop propagation of all touch events on the window during the capture phase. */
@@ -401,6 +406,11 @@ public class AnimatingActivityManager implements PlaceChangeEvent.Handler,
         handlerRegistration = null;
       }
     }
+  }
+
+  public void setStopTouchEventPropagationDuringAnimations(
+      boolean stopTouchEventPropagationDuringAnimations) {
+    this.stopTouchEventPropagationDuringAnimations = stopTouchEventPropagationDuringAnimations;
   }
 
 }
