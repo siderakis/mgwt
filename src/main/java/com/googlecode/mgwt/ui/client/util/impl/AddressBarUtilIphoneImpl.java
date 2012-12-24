@@ -13,22 +13,31 @@
  */
 package com.googlecode.mgwt.ui.client.util.impl;
 
+import com.google.gwt.core.client.Scheduler;
+import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.dom.client.Document;
+import com.google.gwt.dom.client.Element;
+import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.logical.shared.ResizeEvent;
 import com.google.gwt.event.logical.shared.ResizeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
-import com.googlecode.mgwt.dom.client.event.orientation.OrientationChangeEvent.ORIENTATION;
+import com.google.gwt.user.client.ui.RootPanel;
 import com.googlecode.mgwt.ui.client.MGWT;
 import com.googlecode.mgwt.ui.client.util.AddressBarUtil;
 
 public class AddressBarUtilIphoneImpl implements AddressBarUtil {
 
+  private static final int IPHONE_FULLSCREEN_HEIGHT_OFFSET = 60;
+
   private static HandlerRegistration resizeHandler;
 
-  public AddressBarUtilIphoneImpl() {
-
+  @Override
+  public void hideAddressBar() {
+    if (MGWT.canFullSreen()) {
+      ensureResizeListener();
+      resize();
+    }
   }
 
   @Override
@@ -37,71 +46,49 @@ public class AddressBarUtilIphoneImpl implements AddressBarUtil {
 
   }
 
-  @Override
-  public void hideAddressBar() {
-    ensureResizeListener();
-
-    updateSizeAndScrollBar();
-
+  private void resize() {
+    Scheduler.get().scheduleDeferred(new ScheduledCommand() {
+      public void execute() {
+        double height = Window.getClientHeight() + IPHONE_FULLSCREEN_HEIGHT_OFFSET;
+        RootPanel.getBodyElement().getStyle().setHeight(height, Unit.PX);
+        RootPanel.getBodyElement().getStyle().setProperty("minHeight", height, Unit.PX);
+        Window.scrollTo(0, 0);
+      }
+    });
   }
+
+  private native void setupPreventScrolling(Element el)/*-{
+		var func = function(event) {
+			event.preventDefault();
+			return false;
+		};
+		el.ontouchmove = func;
+  }-*/;
+
+  private native void setupScrollOnTouch(Element el)/*-{
+		var func = function(event) {
+			$wnd.scroll(0, 0);
+			return true;
+		};
+		el.ontouchstart = func;
+  }-*/;
 
   protected void ensureResizeListener() {
     if (resizeHandler != null)
       return;
 
+    setupPreventScrolling(Document.get().getBody());
+    setupScrollOnTouch(Document.get().getBody());
+
     resizeHandler = Window.addResizeHandler(new ResizeHandler() {
 
       @Override
       public void onResize(ResizeEvent event) {
-        updateSizeAndScrollBar();
+        resize();
       }
 
     });
 
   }
-
-  protected void updateSizeAndScrollBar() {
-    int innerHeight = getInnerHeight();
-
-    ORIENTATION orientation = MGWT.getOrientation();
-
-    // ios
-    switch (orientation) {
-      case LANDSCAPE:
-        if (innerHeight < 269) {
-          updateSize(269); // 208 + 60 +1
-        }
-
-        break;
-
-      case PORTRAIT:
-        if (innerHeight < 417) {
-          updateSize(417); // 356 + 60 +1
-        }
-      default:
-        break;
-    }
-
-    doScroll();
-  }
-
-  private static void updateSize(int y) {
-    Document.get().getBody().getStyle().setPropertyPx("minHeight", y);
-  }
-
-  private static void doScroll() {
-    new Timer() {
-
-      @Override
-      public void run() {
-        Window.scrollTo(0, 1);
-
-      }
-    }.schedule(1);
-  }
-
-  private native static int getInnerHeight()/*-{
-		return $wnd.innerHeight;
-  }-*/;
 
 }

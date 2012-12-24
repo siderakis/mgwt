@@ -36,6 +36,7 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.event.shared.SimpleEventBus;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.Window.Navigator;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.googlecode.mgwt.dom.client.event.orientation.OrientationChangeEvent;
@@ -479,5 +480,39 @@ public class MGWT {
     }
     return manager;
   }
+  
+  
+  private static Boolean isChrome;
+
+  public static boolean canFullSreen() {
+
+    // compile time checks
+    if (!MGWT.getOsDetection().isIPhone() || isNativeApp())
+      return false;
+
+    if(isChrome==null)
+      // https://developers.google.com/chrome/mobile/docs/user-agent
+      isChrome = Navigator.getUserAgent().contains("CriOS");
+
+    // runtime checks
+    if (isChrome || isFullScreen())
+      return false;
+    
+    return true;
+  }
+  /** Override in native permutation */
+  protected static boolean isNativeApp() {
+    return false;
+  }
+
+  /** This handler allows touch move events to scroll the window */
+  public static native void skipPreventScrolling(Element el)/*-{
+    var func = function(event) {
+      event.stopPropagation();
+      return true;
+    };
+    el.ontouchmove = func;
+    el.ontouchstart = func;
+  }-*/;
 
 }

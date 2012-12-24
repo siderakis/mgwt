@@ -15,11 +15,13 @@
  */
 package com.googlecode.mgwt.ui.client.widget;
 
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.uibinder.client.UiChild;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
+import com.googlecode.mgwt.ui.client.MGWT;
 import com.googlecode.mgwt.ui.client.MGWTStyle;
 import com.googlecode.mgwt.ui.client.theme.base.HeaderCss;
 
@@ -82,7 +84,9 @@ public class HeaderPanel extends Composite {
 		container.setStylePrimaryName(this.css.headerPanel());
 
 		initWidget(container);
-
+		if (MGWT.canFullSreen()) {
+      MGWT.skipPreventScrolling(getElement());
+    }
 	}
 
 	/**
