@@ -120,9 +120,8 @@ public class LongTapRecognizer implements TouchHandler {
     this.time = time;
     this.distance = maxDistance;
 
-    state = State.READY;
+    reset();
     startPositions = CollectionFactory.constructArray();
-    touchCount = 0;
 
   }
 
@@ -151,7 +150,7 @@ public class LongTapRecognizer implements TouchHandler {
         break;
       case FINGERS_UP:
       default:
-        state = State.INVALID;
+        invalidate();
         break;
     }
 
@@ -174,7 +173,7 @@ public class LongTapRecognizer implements TouchHandler {
     }
 
     if (touchCount > numberOfFingers) {
-      state = State.INVALID;
+      invalidate();
     }
 
   }
@@ -200,7 +199,7 @@ public class LongTapRecognizer implements TouchHandler {
             Touch startTouch = startPositions.get(j);
             if (currentTouch.getIdentifier() == startTouch.getIdentifier()) {
               if (Math.abs(currentTouch.getPageX() - startTouch.getPageX()) > distance || Math.abs(currentTouch.getPageY() - startTouch.getPageY()) > distance) {
-                state = State.INVALID;
+                invalidate();
                 break;
               }
             }
@@ -213,7 +212,7 @@ public class LongTapRecognizer implements TouchHandler {
         break;
 
       default:
-        state = State.INVALID;
+        state=State.INVALID;
         break;
     }
 
@@ -231,7 +230,7 @@ public class LongTapRecognizer implements TouchHandler {
     int currentTouches = event.getTouches().length();
     switch (state) {
       case WAITING:
-        state = State.INVALID;
+        invalidate();
         break;
 
       case FINGERS_DOWN:
@@ -255,6 +254,9 @@ public class LongTapRecognizer implements TouchHandler {
 
   }
 
+  public void invalidate() {
+    state = State.INVALID;
+  }
   /*
    * (non-Javadoc)
    * 
@@ -264,7 +266,7 @@ public class LongTapRecognizer implements TouchHandler {
    */
   @Override
   public void onTouchCanceled(TouchCancelEvent event) {
-    state = State.INVALID;
+    invalidate();
     int currentTouches = event.getTouches().length();
     if (currentTouches == 0)
       reset();
@@ -296,7 +298,7 @@ public class LongTapRecognizer implements TouchHandler {
     return timerExecutor;
   }
 
-  protected void reset() {
+  public void reset() {
     state = State.READY;
     touchCount = 0;
   }
