@@ -15,7 +15,6 @@
  */
 package com.googlecode.mgwt.ui.client.widget;
 
-import com.google.gwt.dom.client.Element;
 import com.google.gwt.uibinder.client.UiChild;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;

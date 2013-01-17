@@ -60,7 +60,6 @@ public class AddressBarUtilIphoneImpl implements AddressBarUtil {
   private native void setupPreventScrolling(Element el)/*-{
 		var func = function(event) {
 			event.preventDefault();
-			return false;
 		};
 		el.ontouchmove = func;
   }-*/;
@@ -68,7 +67,6 @@ public class AddressBarUtilIphoneImpl implements AddressBarUtil {
   private native void setupScrollOnTouch(Element el)/*-{
 		var func = function(event) {
 			$wnd.scroll(0, 0);
-			return true;
 		};
 		el.ontouchstart = func;
   }-*/;

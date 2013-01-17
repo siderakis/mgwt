@@ -17,7 +17,6 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.Scheduler.ScheduledCommand;
-import com.google.gwt.dom.client.BodyElement;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.LinkElement;
@@ -64,6 +63,8 @@ public class MGWT {
   private static Timer timer;
 
   private static boolean scrollingDisabled;
+  private static boolean isNativeApp = false;
+  
   private static JavaScriptObject nativeJsFunction;
 
   private static AddressBarUtil addressBarUtil;
@@ -144,13 +145,8 @@ public class MGWT {
 
     }
 
-    scrollingDisabled = settings.isPreventScrolling();
-    if (settings.isPreventScrolling() && getOsDetection().isIOs()) {
-      BodyElement body = Document.get().getBody();
-      setupPreventScrolling(body);
-
-    }
-
+    isNativeApp = settings.isNativeApp();
+    
     if (settings.isDisablePhoneNumberDetection()) {
       MetaElement fullScreenMetaTag = Document.get().createMetaElement();
       fullScreenMetaTag.setName("format-detection");
@@ -187,7 +183,7 @@ public class MGWT {
    * 
    * @return true if the web app is in full screen mode, otherwise false
    */
-  public static native boolean isFullScreen()/*-{
+  public static native boolean isStandalone()/*-{
 		if ($wnd.navigator.standalone) {
 			return true;
 		}
@@ -424,16 +420,6 @@ public class MGWT {
 		$doc.removeEventListener("orientationChanged", o);
   }-*/;
 
-  private static native void setupPreventScrolling(Element el)/*-{
-		var func = function(event) {
-			event.preventDefault();
-			return false;
-		};
-
-		el.ontouchmove = func;
-
-  }-*/;
-
   /**
    * A utility method to hide the soft keyboard
    */
@@ -483,33 +469,37 @@ public class MGWT {
   
   
   private static Boolean isChrome;
-
+  private static Boolean isSafari;
+  
   public static boolean canFullSreen() {
 
     // compile time checks
     if (!MGWT.getOsDetection().isIPhone() || isNativeApp())
       return false;
 
-    if(isChrome==null)
+    if(isChrome==null) {
+      // execute once and cache
       // https://developers.google.com/chrome/mobile/docs/user-agent
       isChrome = Navigator.getUserAgent().contains("CriOS");
-
+      isSafari = Navigator.getUserAgent().contains("Version");
+    }
     // runtime checks
-    if (isChrome || isFullScreen())
+    if (isChrome || !isSafari || isStandalone())
       return false;
     
     return true;
   }
-  /** Override in native permutation */
   protected static boolean isNativeApp() {
-    return false;
+    return isNativeApp;
   }
 
-  /** This handler allows touch move events to scroll the window */
+  /** 
+   * This handler allows touch move events to scroll the window by stopping propagation and thus 
+   *  avoiding preventDefault from being called on the event.
+   */
   public static native void skipPreventScrolling(Element el)/*-{
     var func = function(event) {
       event.stopPropagation();
-      return true;
     };
     el.ontouchmove = func;
     el.ontouchstart = func;

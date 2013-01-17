@@ -253,8 +253,8 @@ public class MGWTSettings {
     settings.setViewPort(viewPort);
     settings.setAddGlosToIcon(true);
     settings.setFullscreen(true);
-    settings.setPreventScrolling(true);
-
+    settings.setNativeApp(false);
+    
     return settings;
   }
 
@@ -297,6 +297,8 @@ public class MGWTSettings {
 
   private boolean preventScrolling;
 
+  private boolean nativeApp;
+  
   private boolean disablePhoneNumberDetection;
 
   private StatusBarStyle statusBarStyle;
@@ -433,15 +435,6 @@ public class MGWTSettings {
   }
 
   /**
-   * Should mgwt prevent default scrolling behaviour
-   * 
-   * @param preventScrolling true if mgwt should prevent default scrolling behaviour
-   */
-  public void setPreventScrolling(boolean preventScrolling) {
-    this.preventScrolling = preventScrolling;
-  }
-
-  /**
    * <p>
    * ios only
    * </p>
@@ -490,5 +483,20 @@ public class MGWTSettings {
    */
   public StatusBarStyle getStatusBarStyle() {
     return statusBarStyle;
+  }
+
+  public boolean isNativeApp() {
+    return nativeApp;
+  }
+  
+  /**
+   * <p>
+   * default false
+   * </p>
+   * 
+   * 
+   */
+  public void setNativeApp(boolean nativeApp) {
+    this.nativeApp = nativeApp;
   }
 }
