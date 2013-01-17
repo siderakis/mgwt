@@ -1,12 +1,12 @@
 .mgwt-ButtonBar {
-	height: 49px;
-	border-top: 1px solid rgb(45, 54, 66);
+	height: 44px;
 }
 
 
 @if user.agent safari {
 	.mgwt-ButtonBar {
 		background: literal('-webkit-gradient(linear,left bottom,left top,color-stop(0, #A8ACB9),color-stop(1, #eee))');
+		\-webkit-box-pack: center;
 	}
 }
 

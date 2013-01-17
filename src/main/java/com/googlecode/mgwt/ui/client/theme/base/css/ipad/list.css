@@ -43,7 +43,7 @@
 
 @if user.agent safari {
 	.mgwt-List-canbeSelected.mgwt-List-selected {
-		background-image: literal('-webkit-gradient(linear, left top, left bottom, from(rgb(5, 140, 245)), to(rgb(1, 95, 230)) )');
+		background-image: literal('-webkit-gradient(linear, left top, left bottom, from(#E4F3FF), to(#EDF5FF) )');
 	}
 }
 

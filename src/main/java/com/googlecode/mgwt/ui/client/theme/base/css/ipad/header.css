@@ -1,7 +1,6 @@
 .mgwt-HeaderPanel {
 	height: 40px;
 	background: #B0B4C0;
-	border-bottom: 1px solid #797F90;
 }
 
 @if user.agent safari {

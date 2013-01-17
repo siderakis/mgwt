@@ -20,6 +20,9 @@
 		background-color: inherit;
 		border: none;
 		color: white;
+		border-bottom: 1px solid #323232;
+		border-radius: 0px;
+		
 	}
 	
 }
