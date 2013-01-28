@@ -289,4 +289,12 @@ public class PullPanel extends Composite implements HasWidgets, HasRefresh {
     return scrollPanel;
   }
 
+  public void setFooterVisible(boolean isVisible) {
+    if (footer != null) {
+      footer.asWidget().setVisible(isVisible);
+      getScrollPanel().setOffSetMaxY(footer.getHeight());
+      refresh();
+    }
+  }
+
 }

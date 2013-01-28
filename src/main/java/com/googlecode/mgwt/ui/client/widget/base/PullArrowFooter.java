@@ -44,5 +44,13 @@ public class PullArrowFooter extends PullArrowBase {
 		return degree;
 
 	}
+	
+  @Override
+  public int getHeight() {
+    if (isVisible())
+      return super.getHeight();
+    return 0;
+  }
+
 
 }
