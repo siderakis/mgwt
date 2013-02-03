@@ -17,6 +17,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.Scheduler.ScheduledCommand;
+import com.google.gwt.dom.client.BodyElement;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.LinkElement;
@@ -146,6 +147,14 @@ public class MGWT {
     }
 
     isNativeApp = settings.isNativeApp();
+    
+    scrollingDisabled = settings.isPreventScrolling();
+    if (settings.isPreventScrolling() && getOsDetection().isIOs()) {
+      BodyElement body = Document.get().getBody();
+      setupPreventScrolling(body);
+
+    }
+
     
     if (settings.isDisablePhoneNumberDetection()) {
       MetaElement fullScreenMetaTag = Document.get().createMetaElement();
@@ -493,6 +502,17 @@ public class MGWT {
     return isNativeApp;
   }
 
+  private static native void setupPreventScrolling(Element el)/*-{
+  var func = function(event) {
+    event.preventDefault();
+    return false;
+  };
+
+  el.ontouchmove = func;
+
+  }-*/;
+
+  
   /** 
    * This handler allows touch move events to scroll the window by stopping propagation and thus 
    *  avoiding preventDefault from being called on the event.

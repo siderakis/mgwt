@@ -253,9 +253,14 @@ public class MGWTSettings {
     settings.setViewPort(viewPort);
     settings.setAddGlosToIcon(true);
     settings.setFullscreen(true);
+    settings.setPreventScrolling(true);
     settings.setNativeApp(false);
     
     return settings;
+  }
+
+  public void setPreventScrolling(boolean b) {
+     this.preventScrolling = b;    
   }
 
   /**
