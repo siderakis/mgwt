@@ -480,6 +480,7 @@ public class MGWT {
   private static Boolean isChrome;
   private static Boolean isSafari;
   
+  /**only returns true on safari on the iPhone*/
   public static boolean canFullSreen() {
 
     // compile time checks
@@ -503,13 +504,10 @@ public class MGWT {
   }
 
   private static native void setupPreventScrolling(Element el)/*-{
-  var func = function(event) {
-    event.preventDefault();
-    return false;
-  };
-
-  el.ontouchmove = func;
-
+    var func = function(event) {
+      event.preventDefault();
+    };
+    el.ontouchmove = func;
   }-*/;
 
   

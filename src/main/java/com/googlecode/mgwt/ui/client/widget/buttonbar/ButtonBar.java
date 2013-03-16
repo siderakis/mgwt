@@ -94,5 +94,9 @@ public class ButtonBar extends Composite implements HasWidgets {
 	public boolean remove(Widget w) {
 		return main.remove(w);
 	}
+	
+	public void insert(Widget w) {
+	  main.insert(w,0);
+	}
 
 }
