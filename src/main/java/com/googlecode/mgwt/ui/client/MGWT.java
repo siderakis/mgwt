@@ -50,9 +50,9 @@ import com.googlecode.mgwt.ui.client.util.AddressBarUtil;
 /**
  * The MGWT Object is used to apply settings for an MGWT App. It also provides an instance of
  * {@link OsDetection}, as well a way to determine the device orientation
- * 
- * 
- * 
+ *
+ *
+ *
  * @author Daniel Kurka
  */
 public class MGWT {
@@ -66,14 +66,14 @@ public class MGWT {
 
   private static boolean scrollingDisabled;
   private static boolean isNativeApp = false;
-  
+
   private static JavaScriptObject nativeJsFunction;
 
   private static AddressBarUtil addressBarUtil;
 
   /**
    * Add a orientation handler to detect the device orientation
-   * 
+   *
    * @param handler the handler to add
    *          {@link com.googlecode.mgwt.dom.client.event.orientation.OrientationChangeHandler} .
    * @return a {@link com.google.gwt.event.shared.HandlerRegistration} object.
@@ -86,11 +86,11 @@ public class MGWT {
   /**
    * Apply settings for this mgwt app. Every app should call this method with the options its wants
    * for their app
-   * 
+   *
    * The options are documented in @link {@link MGWTSettings}
-   * 
+   *
    * @param settings the settings for this app
-   * 
+   *
    */
   public static void applySettings(MGWTSettings settings) {
 
@@ -148,15 +148,20 @@ public class MGWT {
     }
 
     isNativeApp = settings.isNativeApp();
-    
-    scrollingDisabled = settings.isPreventScrolling();
-    if (settings.isPreventScrolling() && getOsDetection().isIOs()) {
-      BodyElement body = Document.get().getBody();
-      setupPreventScrolling(body);
 
+    scrollingDisabled = settings.isPreventScrolling();
+    if (settings.isPreventScrolling()){
+      if(getOsDetection().isIOs()) {
+        BodyElement body = Document.get().getBody();
+        setupPreventScrolling(body);
+      }else if(getOsDetection().isAndroidPhone()){
+//TODO
+//        BodyElement body = Document.get().getBody();
+//        setupPreventScrolling(body);
+      }
     }
 
-    
+
     if (settings.isDisablePhoneNumberDetection()) {
       MetaElement fullScreenMetaTag = Document.get().createMetaElement();
       fullScreenMetaTag.setName("format-detection");
@@ -188,9 +193,9 @@ public class MGWT {
 
   /**
    * Detect if a web app is in full screen mode
-   * 
+   *
    * fullscreen currently only exits on ios
-   * 
+   *
    * @return true if the web app is in full screen mode, otherwise false
    */
   public static native boolean isStandalone()/*-{
@@ -201,7 +206,7 @@ public class MGWT {
   }-*/;
 
   /**
-   * 
+   *
    * Considered internal don`t call!
    * <p>
    * fixIOSScrollIssueBlur
@@ -248,7 +253,7 @@ public class MGWT {
 
   /**
    * Get the os detection interface
-   * 
+   *
    * @return a {@link com.googlecode.mgwt.ui.client.OsDetection} object.
    */
   public static OsDetection getOsDetection() {
@@ -260,7 +265,7 @@ public class MGWT {
 
   /**
    * Get the current orientation of the device
-   * 
+   *
    * @return the current orientation of the device
    */
   public static ORIENTATION getOrientation() {
@@ -475,29 +480,35 @@ public class MGWT {
     }
     return manager;
   }
-  
-  
+
+
   private static Boolean isChrome;
   private static Boolean isSafari;
-  
-  /**only returns true on safari on the iPhone*/
+
+  /**only returns true on safari on the iPhone*, or android. */
   public static boolean canFullSreen() {
 
     // compile time checks
-    if (!MGWT.getOsDetection().isIPhone() || isNativeApp())
-      return false;
+    if (isNativeApp()) return false;
 
-    if(isChrome==null) {
-      // execute once and cache
-      // https://developers.google.com/chrome/mobile/docs/user-agent
-      isChrome = Navigator.getUserAgent().contains("CriOS");
-      isSafari = Navigator.getUserAgent().contains("Version");
+    if(MGWT.getOsDetection().isAndroidPhone())    {
+      // TODO should whitelist/blacklist other android browsers
+      return true;
     }
-    // runtime checks
-    if (isChrome || !isSafari || isStandalone())
-      return false;
-    
-    return true;
+
+    if(MGWT.getOsDetection().isIPhone()){
+      if(isChrome==null) {
+        // execute once and cache
+        // https://developers.google.com/chrome/mobile/docs/user-agent
+        isChrome = Navigator.getUserAgent().contains("CriOS");
+        isSafari = Navigator.getUserAgent().contains("Version");
+      }
+      // runtime checks
+      if (isChrome || !isSafari || isStandalone()) return false;
+
+      return true;
+    }
+    return false;
   }
   protected static boolean isNativeApp() {
     return isNativeApp;
@@ -510,9 +521,9 @@ public class MGWT {
     el.ontouchmove = func;
   }-*/;
 
-  
-  /** 
-   * This handler allows touch move events to scroll the window by stopping propagation and thus 
+
+  /**
+   * This handler allows touch move events to scroll the window by stopping propagation and thus
    *  avoiding preventDefault from being called on the event.
    */
   public static native void skipPreventScrolling(Element el)/*-{

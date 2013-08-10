@@ -49,7 +49,7 @@ public class AddressBarUtilIphoneImpl implements AddressBarUtil {
   private void resize() {
     Scheduler.get().scheduleDeferred(new ScheduledCommand() {
       public void execute() {
-        double height = Window.getClientHeight() + IPHONE_FULLSCREEN_HEIGHT_OFFSET;
+        double height = Window.getClientHeight() + getHeightOffset();
         RootPanel.getBodyElement().getStyle().setHeight(height, Unit.PX);
         RootPanel.getBodyElement().getStyle().setProperty("minHeight", height, Unit.PX);
         Window.scrollTo(0, 0);
@@ -89,4 +89,7 @@ public class AddressBarUtilIphoneImpl implements AddressBarUtil {
 
   }
 
+    protected int getHeightOffset() {
+        return IPHONE_FULLSCREEN_HEIGHT_OFFSET;
+    }
 }
