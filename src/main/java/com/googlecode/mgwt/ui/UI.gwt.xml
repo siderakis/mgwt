@@ -179,7 +179,14 @@ under * the License.
 	<replace-with class="com.googlecode.mgwt.ui.client.util.impl.AddressBarUtilNoOpImpl">
 		<when-type-is class="com.googlecode.mgwt.ui.client.util.AddressBarUtil" />
 	</replace-with>
-	
+
+    <replace-with class="com.googlecode.mgwt.ui.client.util.impl.AddressBarUtilAndroidPhoneImpl">
+        <when-type-is class="com.googlecode.mgwt.ui.client.util.AddressBarUtil" />
+        <all>
+            <when-property-is name="mgwt.os" value="android" />
+        </all>
+    </replace-with>
+
 	<replace-with class="com.googlecode.mgwt.ui.client.util.impl.AddressBarUtilIphoneImpl">
 		<when-type-is class="com.googlecode.mgwt.ui.client.util.AddressBarUtil" />
 		<all>
