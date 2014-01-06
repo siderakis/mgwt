@@ -10,8 +10,8 @@ import com.googlecode.mgwt.linker.client.cache.event.CheckingEvent;
 import com.googlecode.mgwt.linker.client.cache.event.CheckingEvent.Handler;
 import com.googlecode.mgwt.linker.client.cache.event.DownloadingEvent;
 import com.googlecode.mgwt.linker.client.cache.event.ErrorEvent;
-import com.googlecode.mgwt.linker.client.cache.event.NoUpadateEvent;
-import com.googlecode.mgwt.linker.client.cache.event.ObsoluteEvent;
+import com.googlecode.mgwt.linker.client.cache.event.NoUpdateEvent;
+import com.googlecode.mgwt.linker.client.cache.event.ObsoleteEvent;
 import com.googlecode.mgwt.linker.client.cache.event.ProgressEvent;
 import com.googlecode.mgwt.linker.client.cache.event.UpdateReadyEvent;
 
@@ -19,7 +19,7 @@ public class Html5ApplicationCache implements ApplicationCache {
 
   private static final ApplicationCacheStatus[] STATUS_MAPPING = new ApplicationCacheStatus[] {
       ApplicationCacheStatus.UNCACHED, ApplicationCacheStatus.IDLE, ApplicationCacheStatus.CHECKING, ApplicationCacheStatus.DOWNLOADING, ApplicationCacheStatus.UPDATEREADY,
-      ApplicationCacheStatus.OBSOLTE};
+      ApplicationCacheStatus.OBSOLETE};
 
   public static Html5ApplicationCache createIfSupported() {
     if (!isSupported()) {
@@ -65,13 +65,13 @@ public class Html5ApplicationCache implements ApplicationCache {
   }
 
   @Override
-  public HandlerRegistration addNoUpdateHandler(com.googlecode.mgwt.linker.client.cache.event.NoUpadateEvent.Handler handler) {
-    return eventBus.addHandler(NoUpadateEvent.getType(), handler);
+  public HandlerRegistration addNoUpdateHandler(com.googlecode.mgwt.linker.client.cache.event.NoUpdateEvent.Handler handler) {
+    return eventBus.addHandler(NoUpdateEvent.getType(), handler);
   }
 
   @Override
-  public HandlerRegistration addObsoluteHandler(com.googlecode.mgwt.linker.client.cache.event.ObsoluteEvent.Handler handler) {
-    return eventBus.addHandler(ObsoluteEvent.getType(), handler);
+  public HandlerRegistration addObsoleteHandler(com.googlecode.mgwt.linker.client.cache.event.ObsoleteEvent.Handler handler) {
+    return eventBus.addHandler(ObsoleteEvent.getType(), handler);
   }
 
   @Override
@@ -97,15 +97,15 @@ public class Html5ApplicationCache implements ApplicationCache {
   }
 
   protected void onNoUpdate() {
-    eventBus.fireEventFromSource(new NoUpadateEvent(), this);
+    eventBus.fireEventFromSource(new NoUpdateEvent(), this);
   }
 
   protected void onDownloading() {
     eventBus.fireEventFromSource(new DownloadingEvent(), this);
   }
 
-  protected void onProgress() {
-    eventBus.fireEventFromSource(new ProgressEvent(), this);
+  protected void onProgress(boolean lengthComputable, int loaded, int total) {
+    eventBus.fireEventFromSource(new ProgressEvent(lengthComputable, loaded, total), this);
   }
 
   protected void onUpdateReady() {
@@ -117,7 +117,7 @@ public class Html5ApplicationCache implements ApplicationCache {
   }
 
   protected void onObsolete() {
-    eventBus.fireEventFromSource(new ObsoluteEvent(), this);
+    eventBus.fireEventFromSource(new ObsoleteEvent(), this);
   }
 
   protected native void initialize() /*-{
@@ -132,45 +132,49 @@ public class Html5ApplicationCache implements ApplicationCache {
 			that.@com.googlecode.mgwt.linker.client.cache.html5.Html5ApplicationCache::onError()();
 
 		});
-		$wnd.applicationCache.addEventListener("onerror", onError);
+		$wnd.applicationCache.addEventListener("error", onError);
 
 		var onUpdate = $entry(function() {
 			that.@com.googlecode.mgwt.linker.client.cache.html5.Html5ApplicationCache::onNoUpdate()();
 
 		});
-		$wnd.applicationCache.addEventListener("onnoupdate", onUpdate);
+		$wnd.applicationCache.addEventListener("noupdate", onUpdate);
 
 		var ondownloading = $entry(function() {
 			that.@com.googlecode.mgwt.linker.client.cache.html5.Html5ApplicationCache::onDownloading()();
 		});
-		$wnd.applicationCache.addEventListener("ondownloading", ondownloading);
+		$wnd.applicationCache.addEventListener("downloading", ondownloading);
 
-		var onprogress = $entry(function() {
-			that.@com.googlecode.mgwt.linker.client.cache.html5.Html5ApplicationCache::onProgress()();
+		var onprogress = $entry(function(event) {
+			that.@com.googlecode.mgwt.linker.client.cache.html5.Html5ApplicationCache::onProgress(ZII)(event.lengthComputable, event.loaded, event.total);
 		});
-		$wnd.applicationCache.addEventListener("onprogress", onprogress);
+		$wnd.applicationCache.addEventListener("progress", onprogress);
 
 		var onupdateReady = $entry(function() {
 			that.@com.googlecode.mgwt.linker.client.cache.html5.Html5ApplicationCache::onUpdateReady()();
 		});
-		$wnd.applicationCache.addEventListener("onupdateready", onupdateReady);
+		$wnd.applicationCache.addEventListener("updateready", onupdateReady);
 
 		var oncached = $entry(function() {
 			that.@com.googlecode.mgwt.linker.client.cache.html5.Html5ApplicationCache::onCached()();
 		});
-		$wnd.applicationCache.addEventListener("oncached", oncached);
+		$wnd.applicationCache.addEventListener("cached", oncached);
 
 		var onobsolete = $entry(function() {
 			that.@com.googlecode.mgwt.linker.client.cache.html5.Html5ApplicationCache::onObsolete()();
 		});
-		$wnd.applicationCache.addEventListener("onobsolete", onobsolete);
+		$wnd.applicationCache.addEventListener("obsolete", onobsolete);
 
   }-*/;
 
   @Override
   public native void swapCache() /*-{
 		$wnd.applicationCache.swapCache();
-
+  }-*/;
+  
+  @Override
+  public native void update() /*-{
+		$wnd.applicationCache.update();
   }-*/;
 
 }
