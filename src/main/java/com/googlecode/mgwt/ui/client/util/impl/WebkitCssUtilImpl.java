@@ -1,7 +1,7 @@
 package com.googlecode.mgwt.ui.client.util.impl;
 
 import com.google.gwt.core.client.JsArrayInteger;
-import com.google.gwt.user.client.Element;
+import com.google.gwt.dom.client.Element;
 
 import com.googlecode.mgwt.ui.client.MGWT;
 
@@ -23,7 +23,6 @@ public class WebkitCssUtilImpl implements CssUtilImpl {
     }
 
     _translate(el, cssText);
-
   }
 
   @Override
@@ -49,15 +48,13 @@ public class WebkitCssUtilImpl implements CssUtilImpl {
 
   @Override
   public void rotate(Element el, int degree) {
-    if (MGWT.getOsDetection().isAndroid()) {
+    if (MGWT.getOsDetection().isAndroid() && !MGWT.getOsDetection().isAndroid4_4_OrHigher()) {
       el.getStyle().setProperty("WebkitTransform", "rotate(" + degree + "deg)");
       // _translate(el, );
     } else {
       el.getStyle().setProperty("WebkitTransform", "rotate(" + degree + "deg) translateZ(0)");
       // _translate(el,"rotate(" + degree + "deg) translateZ(0)");
-
     }
-
   }
 
   @Override

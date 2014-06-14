@@ -1,11 +1,11 @@
 /*
  * Copyright 2010 Daniel Kurka
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License
  * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
  * or implied. See the License for the specific language governing permissions and limitations under
@@ -26,26 +26,21 @@ import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.dom.client.Style.Display;
 import com.google.gwt.dom.client.Style.Float;
 import com.google.gwt.dom.client.Style.Unit;
-import com.google.gwt.dom.client.StyleInjector;
-import com.google.gwt.event.logical.shared.CloseEvent;
-import com.google.gwt.event.logical.shared.CloseHandler;
-import com.google.gwt.event.logical.shared.ResizeEvent;
-import com.google.gwt.event.logical.shared.ResizeHandler;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.event.shared.SimpleEventBus;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.Window.Navigator;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.RootPanel;
-
 import com.googlecode.mgwt.dom.client.event.orientation.OrientationChangeEvent;
 import com.googlecode.mgwt.dom.client.event.orientation.OrientationChangeEvent.ORIENTATION;
 import com.googlecode.mgwt.dom.client.event.orientation.OrientationChangeHandler;
 import com.googlecode.mgwt.ui.client.MGWTSettings.ViewPort;
-import com.googlecode.mgwt.ui.client.theme.base.UtilCss;
+import com.googlecode.mgwt.ui.client.resource.IOS71BodyBug;
+import com.googlecode.mgwt.ui.client.resource.MainResourceHolder;
 import com.googlecode.mgwt.ui.client.util.AddressBarUtil;
+import com.googlecode.mgwt.ui.client.util.OrientationHandler;
 
 /**
  * The MGWT Object is used to apply settings for an MGWT App. It also provides an instance of
@@ -57,19 +52,36 @@ import com.googlecode.mgwt.ui.client.util.AddressBarUtil;
  */
 public class MGWT {
 
+  private static OrientationHandler orientationHandler;
+
+  static {
+    orientationHandler = GWT.create(OrientationHandler.class);
+    orientationHandler.maybeSetupOrientation(getManager());
+  }
+
+  private static FormFactor FORM_FACTOR;
+
+  private static DeviceDensity DEVICE_DENSITY;
+
   private static OsDetection OS_DETECTION;
 
   private static EventBus manager;
 
-  private static ORIENTATION currentOrientation;
   private static Timer timer;
 
-  private static boolean scrollingDisabled;
-  private static boolean isNativeApp = false;
 
+
+  private static boolean scrollingDisabled;
   private static JavaScriptObject nativeJsFunction;
 
   private static AddressBarUtil addressBarUtil;
+  /**
+   * Return an orientation handler based on the current os.
+   * @return
+   */
+  private static OrientationHandler getOrientationHandler() {
+	  return orientationHandler;
+  }
 
   /**
    * Add a orientation handler to detect the device orientation
@@ -79,7 +91,6 @@ public class MGWT {
    * @return a {@link com.google.gwt.event.shared.HandlerRegistration} object.
    */
   public static HandlerRegistration addOrientationChangeHandler(OrientationChangeHandler handler) {
-    maybeSetupOrientation();
     return getManager().addHandler(OrientationChangeEvent.getType(), handler);
   }
 
@@ -94,24 +105,17 @@ public class MGWT {
    */
   public static void applySettings(MGWTSettings settings) {
 
-    // This is a very nasty workaround because GWT CssResource does not
-    // support @media correctly!
-    StyleInjector.inject(MGWTStyle.getTheme().getMGWTClientBundle().utilTextResource().getText());
-
     Element head = getHead();
+    // You can disable injection of default resources
+    // by putting this in your gwt.xml
+    // <set-property name="mgwt.mainresource.inject" value="no" />
+    MainResourceHolder.inject();
 
     if (settings.getIconUrl() != null) {
-
       LinkElement iconUrlLinkElement = Document.get().createLinkElement();
-      if (settings.isAddGlosToIcon()) {
-        iconUrlLinkElement.setRel("apple-touch-startup-image");
-      } else {
-        iconUrlLinkElement.setRel("apple-touch-startup-image-precomposed");
-      }
-
+      iconUrlLinkElement.setRel("apple-touch-icon");
       iconUrlLinkElement.setHref(settings.getIconUrl());
       head.appendChild(iconUrlLinkElement);
-
     }
 
     if (settings.getStartUrl() != null) {
@@ -147,20 +151,12 @@ public class MGWT {
 
     }
 
-    isNativeApp = settings.isNativeApp();
-
     scrollingDisabled = settings.isPreventScrolling();
-    if (settings.isPreventScrolling()){
-      if(getOsDetection().isIOs()) {
-        BodyElement body = Document.get().getBody();
-        setupPreventScrolling(body);
-      }else if(getOsDetection().isAndroidPhone()){
-//TODO
-//        BodyElement body = Document.get().getBody();
-//        setupPreventScrolling(body);
-      }
-    }
+    if (settings.isPreventScrolling() && getOsDetection().isIOs()) {
+      BodyElement body = Document.get().getBody();
+      setupPreventScrolling(body);
 
+    }
 
     if (settings.isDisablePhoneNumberDetection()) {
       MetaElement fullScreenMetaTag = Document.get().createMetaElement();
@@ -189,6 +185,9 @@ public class MGWT {
       head.appendChild(statusBarTag);
     }
 
+    if(settings.shouldFixIOS71BodyBug()) {
+      IOS71BodyBug.applyWorkaround();
+    }
   }
 
   /**
@@ -198,7 +197,7 @@ public class MGWT {
    *
    * @return true if the web app is in full screen mode, otherwise false
    */
-  public static native boolean isStandalone()/*-{
+  public static native boolean isFullScreen()/*-{
 		if ($wnd.navigator.standalone) {
 			return true;
 		}
@@ -251,6 +250,21 @@ public class MGWT {
     timer = null;
   }
 
+
+  public static DeviceDensity getDeviceDensity() {
+    if (DEVICE_DENSITY == null) {
+      DEVICE_DENSITY = GWT.create(DeviceDensity.class);
+    }
+    return DEVICE_DENSITY;
+  }
+
+  public static FormFactor getFormFactor() {
+    if (FORM_FACTOR == null) {
+      FORM_FACTOR = GWT.create(FormFactor.class);
+    }
+    return FORM_FACTOR;
+  }
+
   /**
    * Get the os detection interface
    *
@@ -258,7 +272,7 @@ public class MGWT {
    */
   public static OsDetection getOsDetection() {
     if (OS_DETECTION == null) {
-      OS_DETECTION = GWT.create(OsDetection.class);
+      OS_DETECTION = new OsDetectionRuntimeImpl();
     }
     return OS_DETECTION;
   }
@@ -268,45 +282,8 @@ public class MGWT {
    *
    * @return the current orientation of the device
    */
-  public static ORIENTATION getOrientation() {
-
-    if (!orientationSupport()) {
-      int height = Window.getClientHeight();
-      int width = Window.getClientWidth();
-
-      if (width > height) {
-        return ORIENTATION.LANDSCAPE;
-      } else {
-        return ORIENTATION.PORTRAIT;
-      }
-
-    } else {
-      int orientation = getOrientation0();
-
-      ORIENTATION o;
-      switch (orientation) {
-        case 0:
-        case 180:
-          o = ORIENTATION.PORTRAIT;
-          break;
-
-        case 90:
-        case -90:
-          o = ORIENTATION.LANDSCAPE;
-          break;
-
-        default:
-          throw new IllegalStateException("this should not happen!?");
-      }
-
-      return o;
-    }
-
-  }
-
-  private static void fireOrientationChangedEvent(ORIENTATION orientation) {
-    setClasses(orientation);
-    getManager().fireEvent(new OrientationChangeEvent(orientation));
+  public static ORIENTATION getOrientation(){
+	  return getOrientationHandler().getOrientation();
   }
 
   private static Element getHead() {
@@ -319,119 +296,14 @@ public class MGWT {
     return elementsByTagName.getItem(0);
   }
 
-  private static native int getOrientation0()/*-{
-		if (typeof ($wnd.orientation) == 'undefined') {
-			return 0;
-		}
-
-		return $wnd.orientation;
-  }-*/;
-
-  private static void onorientationChange(int orientation) {
-
-    ORIENTATION o;
-    switch (orientation) {
-      case 0:
-      case 180:
-        o = ORIENTATION.PORTRAIT;
-        break;
-
-      case 90:
-      case -90:
-        o = ORIENTATION.LANDSCAPE;
-        break;
-
-      default:
-        o = ORIENTATION.PORTRAIT;
-        break;
-    }
-    currentOrientation = o;
-    fireOrientationChangedEvent(o);
-
-  }
-
-  // update styles on body
-  private static void setClasses(ORIENTATION o) {
-    UtilCss utilCss = MGWTStyle.getTheme().getMGWTClientBundle().getUtilCss();
-    switch (o) {
-
-      case PORTRAIT:
-        Document.get().getBody().addClassName(utilCss.portrait());
-        Document.get().getBody().removeClassName(utilCss.landscape());
-        break;
-      case LANDSCAPE:
-        Document.get().getBody().addClassName(utilCss.landscape());
-        Document.get().getBody().removeClassName(utilCss.portrait());
-        break;
-
-      default:
-        break;
-    }
-  }
-
-  private native static boolean orientationSupport()/*-{
-		var ua = window.navigator.userAgent.toLowerCase();
-		if (ua.indexOf('android') != -1) {
+  private static native void setupPreventScrolling(Element el)/*-{
+		var func = function(event) {
+			event.preventDefault();
 			return false;
-		}
-		if (ua.indexOf('iphone') != -1) {
-			return true;
-		}
-		if (ua.indexOf('ipad') != -1) {
-			return true;
-		}
+		};
 
-		return false;
-  }-*/;
+		el.ontouchmove = func;
 
-  private static boolean orientationInitialized;
-
-  private static void maybeSetupOrientation() {
-    if (orientationInitialized)
-      return;
-    if (!GWT.isClient()) {
-      return;
-    }
-
-    if (!orientationSupport()) {
-      Window.addResizeHandler(new ResizeHandler() {
-
-        @Override
-        public void onResize(ResizeEvent event) {
-          ORIENTATION orientation = getOrientation();
-          if (orientation != currentOrientation) {
-            currentOrientation = orientation;
-            fireOrientationChangedEvent(orientation);
-          }
-        }
-      });
-    } else {
-      nativeJsFunction = setupOrientation0();
-      Window.addCloseHandler(new CloseHandler<Window>() {
-
-        @Override
-        public void onClose(CloseEvent<Window> event) {
-          destroyOrientation(nativeJsFunction);
-
-        }
-      });
-    }
-
-  }
-
-  private static native JavaScriptObject setupOrientation0()/*-{
-
-		var func = $entry(function() {
-			@com.googlecode.mgwt.ui.client.MGWT::onorientationChange(I)($wnd.orientation);
-		});
-		$doc.body.onorientationchange = func;
-		$doc.addEventListener("orientationChanged", func);
-		return func;
-  }-*/;
-
-  private static native void destroyOrientation(JavaScriptObject o)/*-{
-		$doc.body.onorientationchange = null;
-		$doc.removeEventListener("orientationChanged", o);
   }-*/;
 
   /**
@@ -480,58 +352,5 @@ public class MGWT {
     }
     return manager;
   }
-
-
-  private static Boolean isChrome;
-  private static Boolean isSafari;
-
-  /**only returns true on safari on the iPhone*, or android. */
-  public static boolean canFullSreen() {
-
-    // compile time checks
-    if (isNativeApp()) return false;
-
-    if(MGWT.getOsDetection().isAndroidPhone())    {
-      // TODO should whitelist/blacklist other android browsers
-      return true;
-    }
-
-    if(MGWT.getOsDetection().isIPhone()){
-      if(isChrome==null) {
-        // execute once and cache
-        // https://developers.google.com/chrome/mobile/docs/user-agent
-        isChrome = Navigator.getUserAgent().contains("CriOS");
-        isSafari = Navigator.getUserAgent().contains("Version");
-      }
-      // runtime checks
-      if (isChrome || !isSafari || isStandalone()) return false;
-
-      return true;
-    }
-    return false;
-  }
-  protected static boolean isNativeApp() {
-    return isNativeApp;
-  }
-
-  private static native void setupPreventScrolling(Element el)/*-{
-    var func = function(event) {
-      event.preventDefault();
-    };
-    el.ontouchmove = func;
-  }-*/;
-
-
-  /**
-   * This handler allows touch move events to scroll the window by stopping propagation and thus
-   *  avoiding preventDefault from being called on the event.
-   */
-  public static native void skipPreventScrolling(Element el)/*-{
-    var func = function(event) {
-      event.stopPropagation();
-    };
-    el.ontouchmove = func;
-    el.ontouchstart = func;
-  }-*/;
 
 }
