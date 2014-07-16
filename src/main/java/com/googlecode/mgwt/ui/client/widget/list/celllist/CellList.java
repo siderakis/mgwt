@@ -80,6 +80,8 @@ public class CellList<T> extends Widget implements HasCellSelectedHandler {
   protected static final EventPropagator EVENT_PROPAGATOR = GWT.create(EventPropagator.class);
 
 
+  public int initTouchIndex = -1;
+
   private class InternalTouchHandler implements TouchHandler {
 
     private boolean moved;
@@ -173,6 +175,7 @@ public class CellList<T> extends Widget implements HasCellSelectedHandler {
       if (idxString.length() > 0) {
         try {
           index = Integer.parseInt(idxString);
+          initTouchIndex = Integer.parseInt(idxString);
           node = target;
           startTimer(node);
         } catch (Exception e) {

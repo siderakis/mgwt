@@ -26,7 +26,7 @@ public interface SliderAppearance {
    *
    * @author Daniel Kurka
    */
-  interface SliderCss extends MGWTCssResource {
+  public interface SliderCss extends MGWTCssResource {
     @ClassName("mgwt-Slider")
     public String slider();
 
