@@ -16,7 +16,8 @@
 	\-moz-user-select: text;
 	\-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 	\-webkit-user-modify: read-write-plaintext-only;
-	background-color: #e5e9e8;
+	/*background-color: #e5e9e8;*/
+    background-color: rgba(0, 0, 0, 0);
 }
 
 

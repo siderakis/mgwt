@@ -6,10 +6,20 @@
 	width: 100%;
 }
 
-.mgwt-HeaderPanel {
-	height: 40px;
-	border-bottom: 1px solid rgb(45, 54, 66);
+.mgwt-HeaderPanel canvas{
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 50px;
+    width: 100%;
+    color: #f00;
+    z-index: -1;
 	background: #e5e9e8;
+}
+
+.mgwt-HeaderPanel {
+	height: 50px;
+	/*border-bottom: 1px solid rgb(45, 54, 66);*/
   	color: #454545;
-  	box-shadow: inset 0 -1px #9daca9, 0 1px #d6dcdb;
+  	/*box-shadow: inset 0 -1px #9daca9, 0 1px #d6dcdb;*/
 }

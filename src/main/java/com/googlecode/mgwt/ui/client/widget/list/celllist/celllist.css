@@ -7,11 +7,19 @@
 	position: relative;
 	list-style: none;
 	border-collapse: collapse;
-	border-top: 1px solid #9daca9;
-    background-color: #e5e9e8;
+	/*border-top: 1px solid #9daca9;*/
+    /*background-color: #e5e9e8;*/
     color: #454545;
 }
 
+.mgwt-List canvas{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    color: #d1d1d1;
+}
 .mgwt-List>li {
 	position: relative;
 	list-style-type: none;
@@ -32,11 +40,11 @@
 }
 
 .mgwt-List > li {
-  border-top: 1px solid #fff;
-  border-bottom: 1px solid #9daca9;
+  /*border-top: 1px solid #fff;*/
+  /*border-bottom: 1px solid #9daca9;*/
 }
 .mgwt-List > li.mgwt-List-first {
-	border-top: 1px solid #d6dcdb;
+	/*border-top: 1px solid #d6dcdb;*/
 }
 
 .mgwt-List-round > .mgwt-List-first {
