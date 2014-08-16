@@ -1,7 +1,11 @@
 @if mgwt.css pretty {
-	@external mgwt-ImageButton, mgwt-ImageButton-active, mgwt-ImageButton-disabled, mgwt-ImageButton-image, mgwt-ImageButton-small;
+  @external mgwt-ImageButton, mgwt-ImageButton-active;
+  @external mgwt-ImageButton-disabled, mgwt-ImageButton-image;
+  @external mgwt-ImageButton-small;
 }
 
+@def ICON_BACKGROUND_COLOR #454545;
+@def ICON_BACKGROUND_COLOR_HIGHLIGHT #288ede;
 
 @if user.agent safari {
   .mgwt-ImageButton {
@@ -16,25 +20,29 @@
   }
 }
 
+@if mgwt.formfactor desktop {
+  .mgwt-ImageButton {
+    cursor: pointer;
+  }
+}
+
 .mgwt-ImageButton {
-	display: flex;
-	color: #454545;
-	max-width: 130px;
-	overflow: hidden;
-	background-color: #e5e9e8;
-	box-shadow: inset 0 1px #fff;
-	border: 1px solid #9daca9;
-	border-radius: 6px;
+  display: flex;
+  color: #454545;
+  max-width: 130px;
+  overflow: hidden;
+  background-color: #e5e9e8;
+  box-shadow: inset 0 1px #fff;
+  border: 1px solid #9daca9;
+  border-radius: 6px;
 }
 
 .mgwt-ImageButton-active {
-	color: #757575;
-	box-shadow: inset 0 1px rgba(255, 255, 255, 0.36), 0 0 0 2px #6fb5f1;
-	outline: 0;
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.36);
 }
 
 .mgwt-ImageButton-disabled {
-	opacity: 0.25;
+  opacity: 0.25;
 }
 
 .mgwt-ImageButton-image {
@@ -43,6 +51,11 @@
   background-repeat: no-repeat;
   height: 32px;
   width: 32px;
+  background-color: ICON_BACKGROUND_COLOR;
+}
+
+.mgwt-ImageButton-active .mgwt-ImageButton-image {
+  background-color: ICON_BACKGROUND_COLOR_HIGHLIGHT;
 }
 
 .mgwt-ImageButton-text {
@@ -58,7 +71,6 @@
   line-height: 32px;
 }
 
-
 .mgwt-ImageButton.mgwt-ImageButton-small {
   box-shadow: none;
   border: none;
@@ -72,5 +84,4 @@
   border: none;
   box-shadow: none;
   outline: 0;
-  background-color: #c5c9c8;
 }

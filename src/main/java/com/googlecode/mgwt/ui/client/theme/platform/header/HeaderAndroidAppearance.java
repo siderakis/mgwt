@@ -12,15 +12,25 @@ public class HeaderAndroidAppearance extends HeaderAbstractAppearance {
     Resources.INSTANCE.cssPanel().ensureInjected();
   }
 
+  interface CssButton extends HeaderButtonCss {}
+  interface CssPanel extends HeaderPanelCss {}
+  interface CssTitle extends HeaderTitleCss {}
+
   interface Resources extends ClientBundle {
 
     Resources INSTANCE = GWT.create(Resources.class);
 
-    @Source({"header-button-base.css", "header-button-android.css"})
-    HeaderButtonCss css();
+    @Source({
+        "com/googlecode/mgwt/ui/client/widget/header/header-button.css",
+        "header-button-android.css"})
+    CssButton css();
 
-    @Source({"header-base.css", "header-android.css"})
-    HeaderPanelCss cssPanel();
+    @Source({"com/googlecode/mgwt/ui/client/widget/header/header.css", "header-android.css"})
+    CssPanel cssPanel();
+
+    @Source({
+        "com/googlecode/mgwt/ui/client/widget/header/header-title.css", "header-title-android.css"})
+    CssTitle cssTitle();
   }
 
   @Override
@@ -35,8 +45,6 @@ public class HeaderAndroidAppearance extends HeaderAbstractAppearance {
 
   @Override
   public HeaderTitleCss cssTitle() {
-    // TODO Auto-generated method stub
-    return null;
+    return Resources.INSTANCE.cssTitle();
   }
-
 }

@@ -191,7 +191,6 @@ public class CellList<T> extends Widget implements HasCellSelectedHandler {
 
   protected final Cell<T> cell;
 
-  private boolean group = true;
   protected Timer timer;
 
   @UiField
@@ -227,19 +226,6 @@ public class CellList<T> extends Widget implements HasCellSelectedHandler {
     impl.addTouchHandler(this, touchHandler);
   }
 
-  /**
-   * Should the CellList be rendered with rounded corners
-   *
-   * @param round true to render with rounded corners, otherwise false
-   */
-  public void setRound(boolean round) {
-    if (round) {
-      addStyleName(this.appearance.css().round());
-    } else {
-      removeStyleName(this.appearance.css().round());
-    }
-  }
-
   public HandlerRegistration addCellSelectedHandler(CellSelectedHandler cellSelectedHandler) {
     return addHandler(cellSelectedHandler, CellSelectedEvent.getType());
   }
@@ -262,10 +248,6 @@ public class CellList<T> extends Widget implements HasCellSelectedHandler {
       String clazz = "";
       if (cell.canBeSelected(model)) {
         clazz = this.appearance.css().canbeSelected() + " ";
-      }
-
-      if (group) {
-        clazz += this.appearance.css().group() + " ";
       }
 
       if (i == 0) {
@@ -308,24 +290,6 @@ public class CellList<T> extends Widget implements HasCellSelectedHandler {
     } else {
       li.removeClassName(this.appearance.css().selected());
     }
-  }
-
-  /**
-   * set this widget a group (by default rendered with an arrow)
-   *
-   * @param group
-   */
-  public void setGroup(boolean group) {
-    this.group = group;
-  }
-
-  /**
-   * set this widget a group (by default rendered with an arrow)
-   *
-   * @return group
-   */
-  public boolean isGroup() {
-    return group;
   }
 
   protected void fixBug(final String html) {

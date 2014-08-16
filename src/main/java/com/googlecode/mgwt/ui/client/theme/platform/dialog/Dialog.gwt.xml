@@ -13,35 +13,6 @@ under the License.
 -->
 
 <module>
-  <replace-with class="com.googlecode.mgwt.ui.client.theme.platform.dialog.DialogIPadAppearance">
-    <when-type-is class="com.googlecode.mgwt.ui.client.dialog.DialogAppearance" />
-      <any>
-	    <when-property-is name="mgwt.os" value="ipad" />
-        <when-property-is name="mgwt.os" value="ipad_retina" />
-        <when-property-is name="mgwt.os" value="desktop" />
-     </any>
-  </replace-with>
-
-  <replace-with class="com.googlecode.mgwt.ui.client.theme.platform.dialog.DialogIPhoneAppearance">
-    <when-type-is class="com.googlecode.mgwt.ui.client.dialog.DialogAppearance" />
-      <any>
-	    <when-property-is name="mgwt.os" value="iphone" />
-        <when-property-is name="mgwt.os" value="retina" />
-     </any>
-  </replace-with>
-
-  <replace-with class="com.googlecode.mgwt.ui.client.theme.platform.dialog.DialogAndroidAppearance">
-    <when-type-is class="com.googlecode.mgwt.ui.client.dialog.DialogAppearance" />
-      <any>
-        <when-property-is name="mgwt.os" value="android" />
-        <when-property-is name="mgwt.os" value="android_tablet" />
-     </any>
-  </replace-with>
-
-  <replace-with class="com.googlecode.mgwt.ui.client.theme.platform.dialog.DialogBlackberryAppearance">
-    <when-type-is class="com.googlecode.mgwt.ui.client.dialog.DialogAppearance" />
-	  <any>
-        <when-property-is name="mgwt.os" value="blackberry" />
-      </any>
-  </replace-with>
+  <inherits name="com.googlecode.mgwt.ui.client.theme.platform.dialog.options.OptionsDialog"/>
+  <inherits name="com.googlecode.mgwt.ui.client.theme.platform.dialog.panel.DialogPanel"/>
 </module>

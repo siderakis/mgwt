@@ -1,9 +1,9 @@
 package com.googlecode.mgwt.ui.client.widget.tabbar;
 
 import com.google.gwt.dom.client.Element;
-import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.user.client.ui.Widget;
+
 import com.googlecode.mgwt.ui.client.util.MGWTCssResource;
 import com.googlecode.mgwt.ui.client.widget.button.ButtonBaseAppearance;
 
@@ -38,28 +38,10 @@ public interface TabBarAppearance extends ButtonBaseAppearance {
 
     @ClassName("mgwt-TabBar-Button-text")
     public String text();
-  }
 
-  interface TabBarIcons {
-    ImageResource bookMarkImage();
+    public String BUTTON_BACKGROUND_COLOR();
 
-    ImageResource contactsImage();
-
-    ImageResource downloadsImage();
-
-    ImageResource favoritesImage();
-
-    ImageResource featuredImage();
-
-    ImageResource historyImage();
-
-    ImageResource moreImage();
-
-    ImageResource mostRecentImage();
-
-    ImageResource mostViewedImage();
-
-    ImageResource searchImage();
+    public String BUTTON_BACKGROUND_HIGHLIGHT_COLOR();
   }
 
   @Override
@@ -71,10 +53,6 @@ public interface TabBarAppearance extends ButtonBaseAppearance {
   TabBarCss barCss();
 
   UiBinder<Widget, TabPanel> panelBinder();
-
-  TabBarIcons icons();
-
-  UiBinder<Widget, TabPanel.TabContainer> containerBinder();
 
   UiBinder<Widget, TabPanel.TabBar> barBinder();
 }

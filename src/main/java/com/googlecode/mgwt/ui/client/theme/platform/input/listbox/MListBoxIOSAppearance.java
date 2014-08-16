@@ -11,12 +11,14 @@ public class MListBoxIOSAppearance implements MListBoxAppearance {
     Resources.INSTANCE.css().ensureInjected();
   }
 
+  interface Css extends MListBoxCss {}
+
   interface Resources extends ClientBundle {
 
     Resources INSTANCE = GWT.create(Resources.class);
 
-    @Source({"mlistbox-base.css", "mlistbox-ios.css"})
-    MListBoxCss css();
+    @Source({"com/googlecode/mgwt/ui/client/widget/input/listbox/mlistbox.css", "mlistbox-ios.css"})
+    Css css();
   }
 
   @Override

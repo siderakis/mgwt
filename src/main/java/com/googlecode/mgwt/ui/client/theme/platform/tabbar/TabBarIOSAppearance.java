@@ -1,8 +1,23 @@
+/*
+ *
+ * Copyright 2014 Daniel Kurka
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
 package com.googlecode.mgwt.ui.client.theme.platform.tabbar;
 
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.resources.client.ClientBundle;
-import com.google.gwt.resources.client.ImageResource;
 
 import com.googlecode.mgwt.ui.client.widget.tabbar.TabBarAbstractAppearance;
 
@@ -13,45 +28,17 @@ public class TabBarIOSAppearance extends TabBarAbstractAppearance {
     Resources.INSTANCE.barCss().ensureInjected();
   }
 
-  interface Resources extends ClientBundle, TabBarIcons {
+  interface CssBar extends TabBarCss {}
+  interface CssButton extends TabBarButtonCss {}
+
+  interface Resources extends ClientBundle {
 
     Resources INSTANCE = GWT.create(Resources.class);
 
-    @Source({"tabbar-base.css", "tabbar-ios.css"})
-    TabBarCss barCss();
-    @Source({"tabbar-button-base.css", "tabbar-button-ios.css"})
-    TabBarButtonCss css();
-
-    @Override
-    @Source("resources/bookmarks.png")
-    ImageResource bookMarkImage();
-    @Override
-    @Source("resources/contacts.png")
-    ImageResource contactsImage();
-    @Override
-    @Source("resources/downloads.png")
-    ImageResource downloadsImage();
-    @Override
-    @Source("resources/favorites.png")
-    ImageResource favoritesImage();
-    @Override
-    @Source("resources/featured.png")
-    ImageResource featuredImage();
-    @Override
-    @Source("resources/history.png")
-    ImageResource historyImage();
-    @Override
-    @Source("resources/more.png")
-    ImageResource moreImage();
-    @Override
-    @Source("resources/mostrecent.png")
-    ImageResource mostRecentImage();
-    @Override
-    @Source("resources/mostviewed.png")
-    ImageResource mostViewedImage();
-    @Override
-    @Source("resources/search.png")
-    ImageResource searchImage();
+    @Source({"com/googlecode/mgwt/ui/client/widget/tabbar/tabbar.css", "tabbar-ios.css"})
+    CssBar barCss();
+    @Source({"com/googlecode/mgwt/ui/client/widget/tabbar/tabbar-button.css", "tabbar-button-ios.css"})
+    CssButton css();
   }
 
   @Override
@@ -62,10 +49,5 @@ public class TabBarIOSAppearance extends TabBarAbstractAppearance {
   @Override
   public TabBarCss barCss() {
     return Resources.INSTANCE.barCss();
-  }
-
-  @Override
-  public TabBarIcons icons() {
-    return Resources.INSTANCE;
   }
 }

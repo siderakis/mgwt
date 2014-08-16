@@ -11,12 +11,14 @@ public class FormAndroidAppearance extends FormAbstractAppearance {
     Resources.INSTANCE.css().ensureInjected();
   }
 
+  interface Css extends FormCss {}
+
   interface Resources extends ClientBundle {
 
     Resources INSTANCE = GWT.create(Resources.class);
 
-    @Source({"form-base.css", "form-android.css"})
-    FormCss css();
+    @Source({"com/googlecode/mgwt/ui/client/widget/form/form.css", "form-android.css"})
+    Css css();
   }
 
   @Override

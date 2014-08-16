@@ -13,10 +13,11 @@ under * the License.
 
 <module>
   <!-- Eclipse mixes classpaths so we need to exclude tests here -->
-  <source path='client' excludes='**/*Test.java'/>
+  <source path='client'/>
   <inherits name='com.google.gwt.user.User' />
   <inherits name='com.googlecode.mgwt.dom.DOM' />
 
+  <inherits name="com.googlecode.mgwt.image.Image" />
   <inherits name="com.googlecode.mgwt.ui.client.resource.MainResource" />
   <inherits name='com.googlecode.mgwt.ui.client.widget.animation.Animation' />
   <inherits name='com.googlecode.mgwt.ui.client.widget.button.Button' />
@@ -105,17 +106,6 @@ under * the License.
       <when-property-is name="user.agent" value="ie10" />
     </any>
   </replace-with>
-	
-  <!-- Tabbar Buttons -->
-  <replace-with class="com.googlecode.mgwt.ui.client.widget.tabbar.TabBarButtonBase.TabBarButtonStylerHandlerBackground">
-    <when-type-is class="com.googlecode.mgwt.ui.client.widget.tabbar.TabBarButtonBase.TabBarButtonStylerHandler" />
-  </replace-with>
-  <replace-with class="com.googlecode.mgwt.ui.client.widget.tabbar.TabBarButtonBase.TabBarButtonStylerHandlerWebkit">
-    <when-type-is class="com.googlecode.mgwt.ui.client.widget.tabbar.TabBarButtonBase.TabBarButtonStylerHandler" />
-    <all> 
-      <when-property-is name="user.agent" value="safari" />
-    </all>	
-  </replace-with>
 
   <!-- ButtonBar Buttons -->
   <replace-with class="com.googlecode.mgwt.ui.client.widget.buttonbar.ButtonBarButtonBase.DefaultIconHandler">
@@ -170,5 +160,14 @@ under * the License.
         <when-property-is name="mgwt.formfactor" value="phone" />
         <when-property-is name="mgwt.formfactor" value="tablet" />
       </any>
+  </replace-with>
+
+  <!-- rebind IconHandler implementation -->
+  <replace-with class="com.googlecode.mgwt.ui.client.util.IconHandler.IconHandlerEmulatedImpl">
+    <when-type-is class="com.googlecode.mgwt.ui.client.util.IconHandler.IconHandlerImpl" />
+  </replace-with>
+  <replace-with class="com.googlecode.mgwt.ui.client.util.IconHandler.IconHandlerNativeImpl">
+    <when-type-is class="com.googlecode.mgwt.ui.client.util.IconHandler.IconHandlerImpl" />
+    <when-property-is name="user.agent" value="safari" />
   </replace-with>
 </module>
