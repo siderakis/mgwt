@@ -254,7 +254,7 @@ public class MValueBoxBase<T> extends Composite implements HasBlurHandlers, HasT
 		box.setSelectionRange(pos, length);
 	}
 
-	@Override
+//	@Override
 	public void setText(String text) {
 		box.setText(text);
 	}
