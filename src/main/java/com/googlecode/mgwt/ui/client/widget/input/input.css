@@ -1,12 +1,13 @@
 @if mgwt.css pretty {
 	@external mgwt-TextBox, mgwt-PasswordTextBox, mgwt-TextArea;
 	@external mgwt-InputBox-box, mgwt-InputBox-disabled;
+	@external mgwt-InputBox-invalid;
 }
 
 
 @if user.agent safari {
-  .mgwt-TextBox .mgwt-InputBox-box,.mgwt-PasswordTextBox,
-  .mgwt-InputBox-box,.mgwt-TextArea .mgwt-InputBox-box {
+  .mgwt-TextBox, .mgwt-InputBox-box, .mgwt-PasswordTextBox,
+  .mgwt-InputBox-box, .mgwt-TextArea, .mgwt-InputBox-box {
     display: -webkit-box;
     -webkit-box-flex: 1;
     -webkit-appearance: none;
@@ -17,8 +18,8 @@
 }
 
 @if user.agent gecko1_8 {
-  .mgwt-TextBox .mgwt-InputBox-box,.mgwt-PasswordTextBox,
-  .mgwt-InputBox-box,.mgwt-TextArea, .mgwt-InputBox-box {
+  .mgwt-TextBox, .mgwt-InputBox-box, .mgwt-PasswordTextBox,
+  .mgwt-InputBox-box, .mgwt-TextArea, .mgwt-InputBox-box {
     display: -moz-box;
     -moz-box-flex: 1;
     -moz-appearance: none;
@@ -26,36 +27,31 @@
   }
 }
 
-.mgwt-TextBox .mgwt-InputBox-box,.mgwt-PasswordTextBox,
-.mgwt-InputBox-box,.mgwt-TextArea .mgwt-InputBox-box {
+.mgwt-TextBox, .mgwt-InputBox-box, .mgwt-PasswordTextBox,
+.mgwt-InputBox-box, .mgwt-TextArea, .mgwt-InputBox-box {
   color: #777;
   border: 0;
   font: normal 17px Helvetica;
   padding: 0;
-  display: inline-block;
+  display: flex;
+  flex: 1;
   margin-left: 0px;
   background-color: #e5e9e8;
-}
-
-.mgwt-TextBox,.mgwt-PasswordTextBox,.mgwt-TextArea {
   position: relative;
 }
 
-
-@if user.agent safari {
-  .mgwt-TextBox,.mgwt-PasswordTextBox,.mgwt-TextArea {
-    display: -webkit-box;
-    -webkit-box-flex: 1;
-  }
+.mgwt-InputBox-disabled {
+  color: #CCC;
 }
 
-@if user.agent gecko1_8 {
-  .mgwt-TextBox,.mgwt-PasswordTextBox,.mgwt-TextArea {
-    display: -moz-box;
-    -moz-box-flex: 1;
-  }
+.mgwt-InputBox-disabled::-webkit-input-placeholder {
+  color: #CCC;
 }
 
-/*todo*/
-.mgwt-InputBox-disabled {	
+.mgwt-InputBox-invalid {
+  color: rgb(197, 3, 3);
+}
+
+.mgwt-InputBox-invalid::-webkit-input-placeholder {
+  color: rgb(197, 3, 3);
 }
