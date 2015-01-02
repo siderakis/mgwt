@@ -16,6 +16,7 @@ package com.googlecode.mgwt.ui.client.widget.carousel;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.event.dom.client.TouchMoveEvent;
 import com.google.gwt.event.logical.shared.HasSelectionHandlers;
 import com.google.gwt.event.logical.shared.ResizeEvent;
 import com.google.gwt.event.logical.shared.ResizeHandler;
@@ -40,6 +41,7 @@ import com.googlecode.mgwt.ui.client.widget.panel.flex.FlexPanel;
 import com.googlecode.mgwt.ui.client.widget.panel.flex.FlexPropertyHelper.Justification;
 import com.googlecode.mgwt.ui.client.widget.panel.flex.FlexPropertyHelper.Orientation;
 import com.googlecode.mgwt.ui.client.widget.panel.scroll.ScrollEndEvent;
+import com.googlecode.mgwt.ui.client.widget.panel.scroll.ScrollMoveEvent;
 import com.googlecode.mgwt.ui.client.widget.panel.scroll.ScrollPanel;
 import com.googlecode.mgwt.ui.client.widget.panel.scroll.ScrollRefreshEvent;
 import com.googlecode.mgwt.ui.client.widget.touch.TouchWidget;
@@ -129,11 +131,11 @@ public class Carousel extends Composite implements HasWidgets, HasSelectionHandl
   }
 
   @UiField
-  protected FlexPanel main;
+  public FlexPanel main;
   @UiField
-  protected ScrollPanel scrollPanel;
+  public ScrollPanel scrollPanel;
   @UiField
-  protected FlowPanel container;
+  public FlowPanel container;
   private CarouselIndicatorContainer carouselIndicatorContainer;
   private boolean isVisibleCarouselIndicator = true;
 
@@ -146,6 +148,7 @@ public class Carousel extends Composite implements HasWidgets, HasSelectionHandl
 
   private static final CarouselAppearance DEFAULT_APPEARANCE = GWT.create(CarouselAppearance.class);
   private final CarouselAppearance appearance;
+  private boolean hasScollData;
 
   public Carousel() {
     this(DEFAULT_APPEARANCE);
@@ -177,6 +180,16 @@ public class Carousel extends Composite implements HasWidgets, HasSelectionHandl
         currentPage = page;
         SelectionEvent.fire(Carousel.this, currentPage);
 
+      }
+    });
+
+    scrollPanel.addScrollMoveHandler(new ScrollMoveEvent.Handler() {
+
+      @Override
+      public void onScrollMove(ScrollMoveEvent event) {
+        TouchMoveEvent moveEvent = event.getEvent();
+        moveEvent.stopPropagation();
+        moveEvent.preventDefault();
       }
     });
 
@@ -256,7 +269,7 @@ public class Carousel extends Composite implements HasWidgets, HasSelectionHandl
    * refresh the carousel widget, this is necessary after changing child elements
    */
   public void refresh() {
-
+    hasScollData = false;
     final int delay = MGWT.getOsDetection().isAndroid() ? 200 : 1;
     IMPL.adjust(main, container);
     // allow layout to happen..
@@ -291,17 +304,23 @@ public class Carousel extends Composite implements HasWidgets, HasSelectionHandl
 
         carouselIndicatorContainer.setSelectedIndex(currentPage);
 
-        scrollPanel.refresh();
-
         refreshHandler = scrollPanel.addScrollRefreshHandler(new ScrollRefreshEvent.Handler() {
 
           @Override
           public void onScrollRefresh(ScrollRefreshEvent event) {
             refreshHandler.removeHandler();
             refreshHandler = null;
+            LightArrayInt pagesX = scrollPanel.getPagesX();
+            if (currentPage < 0) {
+              currentPage = 0;
+            } else if(currentPage >= pagesX.length()) {
+              currentPage = pagesX.length() - 1;
+            }
             scrollPanel.scrollToPage(currentPage, 0, 0);
+            hasScollData = true;
           }
         });
+        scrollPanel.refresh();
       }
 
     }.schedule(delay);
@@ -314,12 +333,16 @@ public class Carousel extends Composite implements HasWidgets, HasSelectionHandl
   }
 
   public void setSelectedPage(int index, boolean issueEvent) {
-    LightArrayInt pagesX = scrollPanel.getPagesX();
-    if (index < 0 || index >= pagesX.length()) {
-      throw new IllegalArgumentException("invalid value for index: " + index);
+    if (isAttached() && hasScollData) {
+      LightArrayInt pagesX = scrollPanel.getPagesX();
+      if (index < 0 || index >= pagesX.length()) {
+        throw new IllegalArgumentException("invalid value for index: " + index);
+      }
+      currentPage = index;
+      scrollPanel.scrollToPage(index, 0, 300, issueEvent);
+    } else {
+      currentPage = index;
     }
-    currentPage = index;
-    scrollPanel.scrollToPage(index, 0, 300, issueEvent);
   }
 
   public int getSelectedPage() {
@@ -390,7 +413,7 @@ public class Carousel extends Composite implements HasWidgets, HasSelectionHandl
   }
 
   @UiFactory
-  protected CarouselAppearance getAppearance() {
+  public CarouselAppearance getAppearance() {
 	  return appearance;
   }
 }

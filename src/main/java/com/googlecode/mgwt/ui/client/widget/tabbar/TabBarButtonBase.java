@@ -31,14 +31,17 @@ import com.googlecode.mgwt.ui.client.widget.button.ButtonBase;
 
 public class TabBarButtonBase extends ButtonBase {
   @UiField
-  protected Element icon;
+  public Element icon;
   @UiField
-  protected Element text;
+  public Element text;
 
   private TabBarAppearance appearance;
 
   protected final ImageResource selectedResource;
   protected final ImageResource imageResource;
+  private String iconColor;
+  private String iconSelectedColor;
+  private boolean selected;
 
   public TabBarButtonBase(TabBarAppearance appearance, ImageResource imageResource, ImageResource selectedResource) {
     super(appearance);
@@ -46,22 +49,20 @@ public class TabBarButtonBase extends ButtonBase {
     this.imageResource = imageResource;
     this.selectedResource = selectedResource;
     setElement(this.appearance.uiBinder().createAndBindUi(this));
+    this.iconColor = appearance.css().BUTTON_BACKGROUND_COLOR();
+    this.iconSelectedColor = appearance.css().BUTTON_BACKGROUND_SELECTED_COLOR();
 
-    IconHandler.setIcons(icon, imageResource, appearance.css().BUTTON_BACKGROUND_COLOR());
+    IconHandler.setIcons(icon, imageResource, iconColor);
   }
 
   public void setSelected(boolean selected) {
+    this.selected = selected;
     if (selected) {
       addStyleName(this.appearance.css().selected());
-      if (selectedResource != null) {
-        IconHandler.setIcons(icon, selectedResource, appearance.css().BUTTON_BACKGROUND_HIGHLIGHT_COLOR());
-      }
     } else {
       removeStyleName(this.appearance.css().selected());
-      if (selectedResource != null) {
-        IconHandler.setIcons(icon, imageResource, appearance.css().BUTTON_BACKGROUND_COLOR());
-      }
     }
+    updateIcon();
   }
 
   @Override
@@ -75,7 +76,29 @@ public class TabBarButtonBase extends ButtonBase {
   }
 
   @UiFactory
-  protected TabBarAppearance getAppearance() {
+  public TabBarAppearance getAppearance() {
 	  return appearance;
+  }
+
+  public void setIconColor(String iconColor) {
+    this.iconColor = iconColor;
+    updateIcon();
+  }
+
+  public void setIconSelectedColor(String iconSelectedColor) {
+    this.iconSelectedColor = iconSelectedColor;
+    updateIcon();
+  }
+
+  protected void updateIcon() {
+    if (selected) {
+      if (selectedResource != null) {
+        IconHandler.setIcons(icon, selectedResource, iconSelectedColor);
+      } else {
+        IconHandler.setIcons(icon, imageResource, iconSelectedColor);
+      }
+    } else {
+      IconHandler.setIcons(icon, imageResource, iconColor);
+    }
   }
 }

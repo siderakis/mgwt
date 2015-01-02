@@ -160,8 +160,8 @@ public class Slider extends Widget implements HasValue<Integer>, LeafValueEditor
   }
 
   @UiFactory
-  protected SliderAppearance getApperance() {
-	return apperance;
+  public SliderAppearance getApperance() {
+	  return apperance;
   }
 
   protected void setValue(Integer value, boolean fireEvents, boolean updateSlider) {

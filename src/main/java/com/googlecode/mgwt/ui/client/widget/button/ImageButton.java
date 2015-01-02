@@ -42,12 +42,16 @@ public class ImageButton extends ButtonBase implements IsSizeable {
   private final ImageButtonAppearance appearance;
 
   @UiField
-  Element text;
+  public Element text;
 
   @UiField
-  Element image;
+  public Element image;
 
   private ImageResource icon;
+
+  private String iconColor;
+
+  private String iconActiveColor;
 
   public ImageButton() {
     this(DEFAULT_BUTTON_APPEARANCE, "");
@@ -69,6 +73,8 @@ public class ImageButton extends ButtonBase implements IsSizeable {
     super(appearance);
     this.appearance = appearance;
     setElement(appearance.uiBinder().createAndBindUi(this));
+    this.iconColor = appearance.css().ICON_BACKGROUND_COLOR();
+    this.iconActiveColor = appearance.css().ICON_BACKGROUND_COLOR_ACTIVE();
     setIcon(iconImage);
 
     // iOS6 and old android have problems with the aligning in flexible box model with inline-block
@@ -82,15 +88,13 @@ public class ImageButton extends ButtonBase implements IsSizeable {
       @Override
       public void onTouchCancel(TouchCancelEvent event) {
 
-        IconHandler.setIcons(image, icon, ImageButton.this.appearance.css()
-            .ICON_BACKGROUND_COLOR());
+        IconHandler.setIcons(image, icon, iconColor);
       }
 
       @Override
       public void onTouchEnd(TouchEndEvent event) {
 
-        IconHandler.setIcons(image, icon, ImageButton.this.appearance.css()
-            .ICON_BACKGROUND_COLOR());
+        IconHandler.setIcons(image, icon, iconColor);
       }
 
       @Override
@@ -99,15 +103,13 @@ public class ImageButton extends ButtonBase implements IsSizeable {
 
       @Override
       public void onTouchStart(TouchStartEvent event) {
-
-        IconHandler.setIcons(image, icon, ImageButton.this.appearance.css()
-            .ICON_BACKGROUND_COLOR_HIGHLIGHT());
+        IconHandler.setIcons(image, icon, iconActiveColor);
       }
     });
   }
 
   @UiFactory
-  protected ImageButtonAppearance getAppearance() {
+  public ImageButtonAppearance getAppearance() {
     return appearance;
   }
 
@@ -123,7 +125,7 @@ public class ImageButton extends ButtonBase implements IsSizeable {
 
   public void setIcon(ImageResource icon) {
     this.icon = icon;
-    IconHandler.setIcons(image, icon, appearance.css().ICON_BACKGROUND_COLOR());
+    updateIcon();
   }
 
   @Override
@@ -132,6 +134,24 @@ public class ImageButton extends ButtonBase implements IsSizeable {
       addStyleName(appearance.css().small());
     } else {
       removeStyleName(appearance.css().small());
+    }
+  }
+
+  public void setIconColor(String iconColor) {
+    this.iconColor = iconColor;
+    updateIcon();
+  }
+
+  public void setIconActiveColor(String iconActiveColor) {
+    this.iconActiveColor = iconActiveColor;
+    updateIcon();
+  }
+
+  protected void updateIcon() {
+    if (isActive()) {
+      IconHandler.setIcons(image, icon, iconActiveColor);
+    } else {
+      IconHandler.setIcons(image, icon, iconColor);
     }
   }
 }
